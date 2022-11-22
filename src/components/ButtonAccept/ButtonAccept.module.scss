@@ -1,0 +1,10 @@
+@import 'styles/templates.scss';
+@import 'styles/vars.scss';
+
+.button {
+  @extend %button;
+}
+
+.icon {
+  color: $colorSuccess;
+}

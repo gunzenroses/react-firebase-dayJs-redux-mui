@@ -1,0 +1,20 @@
+@import 'styles/templates.scss';
+@import 'styles/vars.scss';
+
+.button {
+  @extend %button;
+}
+
+.input {
+  display: none;
+  visibility: hidden;
+}
+
+.icon {
+  color: $colorUnfocused;
+
+  &_active {
+    color: $colorMain;
+    cursor: pointer;
+  }
+}

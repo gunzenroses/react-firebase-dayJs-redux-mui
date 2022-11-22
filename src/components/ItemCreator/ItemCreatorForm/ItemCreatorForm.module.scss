@@ -1,0 +1,9 @@
+@import 'styles/templates.scss';
+@import 'styles/vars.scss';
+
+.container {
+  @extend %container;
+  background-color: $colorLight;
+  box-shadow: $boxShadowNew;
+  gap: 5px;
+}

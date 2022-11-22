@@ -1,0 +1,24 @@
+@import 'styles/templates.scss';
+@import 'styles/vars.scss';
+
+.container {
+  @extend %container;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 5px;
+  width: 100%;
+
+  &:hover {
+    box-shadow: $boxShadowHover;
+  }
+
+  &_active {
+    box-shadow: $boxShadowActive;
+    border-radius: 15px;
+    z-index: 1;
+
+    &:hover {
+      box-shadow: $boxShadowActive;
+    }
+  }
+}

@@ -1,0 +1,72 @@
+@import 'styles/vars.scss';
+
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+}
+
+.button {
+  width: $widthIcon;
+  height: $widthIcon;
+  border-radius: 5px;
+  border: none;
+  line-height: 24px;
+  text-align: center;
+  background-color: $colorLight;
+  box-shadow: $boxShadowMain;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: $boxShadowNew;
+  }
+
+  &_active {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: $boxShadowNew;
+
+    &:hover {
+      color: $colorError;
+    }
+  }
+}
+
+.list {
+  display: none;
+  width: fit-content;
+  height: fit-content;
+  border-radius: 5px 0 5px 5px;
+  box-shadow: $boxShadowMain;
+  background-color: $colorLight;
+  visibility: hidden;
+  overflow: hidden;
+  z-index: 2;
+
+  &_active {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    visibility: visible;
+    box-shadow: $boxShadowNew;
+  }
+}
+
+.buttonClose {
+  color: $colorUnfocused;
+
+  &:hover {
+    color: $colorError;
+  }
+}
+
+.buttonOpen {
+  color: $colorUnfocused;
+
+  &:hover {
+    color: $colorMain;
+  }
+}

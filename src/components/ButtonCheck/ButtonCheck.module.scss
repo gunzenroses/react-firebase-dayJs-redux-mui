@@ -1,0 +1,33 @@
+@import 'styles/templates.scss';
+@import 'styles/vars.scss';
+
+.button {
+  @extend %button;
+}
+
+.iconUnchecked {
+  color: $colorUnfocused;
+
+  &_active {
+    color: $colorText;
+  }
+}
+
+.iconHovered {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: transparent;
+
+  &:hover {
+    color: $colorUnfocused;
+  }
+
+  &_active:hover {
+    color: $colorText;
+  }
+}
+
+.iconChecked {
+  color: $colorMain;
+}

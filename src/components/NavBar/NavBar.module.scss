@@ -1,0 +1,12 @@
+@import 'styles/vars.scss';
+
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  height: 60px;
+  line-height: 60px;
+  overflow: visible;
+}

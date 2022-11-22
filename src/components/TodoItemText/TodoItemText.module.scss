@@ -1,0 +1,67 @@
+@import 'styles/vars.scss';
+
+$lineHeight: 1.25;
+$fontSizeItem: 19px;
+
+:export {
+  lineHeight: $lineHeight;
+  fontSize: $fontSizeItem;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 3px;
+  width: calc(100% - ($heightIcon * 3));
+  height: fit-content;
+}
+
+.title {
+  width: 100%;
+  height: $heightIcon;
+  outline: none;
+  border: none;
+  font-size: $fontSizeMedium;
+  cursor: pointer;
+
+  &_active {
+    border: 1px solid $colorUnfocusedLess;
+    cursor: text;
+  }
+
+  &_completed {
+    color: $colorUnfocused;
+    outline: none;
+    border: none;
+    cursor: default;
+  }
+}
+
+.description {
+  width: 100%;
+  min-width: 100%;
+  height: fit-content;
+  padding: 2px;
+  border: 1px solid $colorUnfocusedLess;
+  font-size: $fontSizeItem;
+  line-height: $lineHeight;
+
+  &:active,
+  &:focus {
+    outline: none;
+    border: 1px solid $colorUnfocusedLess;
+  }
+
+  &_completed {
+    color: $colorUnfocused;
+    outline: none;
+    border: none;
+    cursor: default;
+
+    &:focus {
+      border: none;
+    }
+  }
+}

@@ -1,0 +1,27 @@
+@import 'styles/vars.scss';
+
+.item {
+  width: 100%;
+  height: $heightIcon;
+  padding: 0 15px;
+  border: none;
+  font-size: $fontSizeSmall;
+  line-height: $heightIcon;
+  text-align: right;
+  color: $colorUnfocused;
+  user-select: none;
+  cursor: pointer;
+
+  & + .item {
+    border-top: 1px solid $colorUnfocusedLess;
+  }
+
+  &:hover {
+    color: $colorText;
+    background-color: $colorUnfocusedLess;
+  }
+
+  &_active {
+    color: $colorMain;
+  }
+}

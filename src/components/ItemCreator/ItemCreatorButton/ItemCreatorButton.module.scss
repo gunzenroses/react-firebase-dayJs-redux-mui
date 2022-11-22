@@ -1,0 +1,34 @@
+@import 'styles/templates.scss';
+@import 'styles/vars.scss';
+
+.container {
+  @extend %container;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  padding: 0 24px;
+  border: none;
+  box-shadow: $boxShadowMain;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: $boxShadowNew;;
+  }
+}
+
+.button {
+  @extend %button;
+}
+
+.icon {
+  color: $colorMain;
+}
+
+.text {
+  width: 100%;
+  height: $heightIcon;
+  margin: 0;
+  font-size: $fontSizeMedium;
+  line-height: $heightIcon;
+}
