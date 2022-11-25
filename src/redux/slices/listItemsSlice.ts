@@ -1,24 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit"
 
-const oldData = new Date(2022, 10, 18).toISOString();
-const newData = new Date().toISOString();
+import {
+  getListItem,
+  updateListItem,
+  addListItem,
+  deleteListItem,
+} from '../thunks/listItemsThunk';
 
-const initialState: ItemData[] = [
-  {
-    id: 0,
-    completed: false,
-    title: 'Build a modern To do app',
-    description: 'write some nice app',
-    date: oldData,
-  },
-  {
-    id: 1,
-    completed: false,
-    title: 'Build a modern To do app',
-    description: 'write some nice app',
-    date: newData,
-  },
-];
+const initialState: ListItem[] = [];
 
 const listItemsSlice = createSlice({
   name: 'listItems',
@@ -32,15 +21,46 @@ const listItemsSlice = createSlice({
         return item;
       });
       return replacement;
-    },
-    deleteListItem: (state, action) => {
-      const replacement = state.filter(item => {
-        return item.id !== action.payload;
-      });
-      return replacement;
     }
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getListItem.fulfilled, (_, { payload }) => {
+        return payload;
+      })
+      .addCase(getListItem.rejected, (_, { payload }) => {
+        const message = payload ? payload.message : 'Todo list is empty';
+        console.error(message);
+      })
+      .addCase(updateListItem.fulfilled, (state, { payload }) => {
+        const newState = state.map((item) => {
+          if (item.id === payload!.id) {
+            return payload;
+          }
+          return item;
+        });
+        return newState;
+      })
+      .addCase(updateListItem.rejected, (_, { payload }) => {
+        const message = payload ? payload.message : "Can't update data";
+        console.error(message);
+      })
+      .addCase(addListItem.fulfilled, (state, { payload }) => {
+        return [...state, payload];
+      })
+      .addCase(addListItem.rejected, (_, { payload }) => {
+        const message = payload ? payload.message : "Can't add item";
+        console.error(message);
+      })
+      .addCase(deleteListItem.fulfilled, (state, { payload }) => {
+        return state.filter(item => item.id !== payload);
+      })
+      .addCase(deleteListItem.rejected, (_, { payload }) => {
+        const message = payload ? payload.message : "Can't delete item";
+        console.error(message);
+      })
+  }
 });
 
-export const { changeListItem, deleteListItem } = listItemsSlice.actions;
+export const { changeListItem } = listItemsSlice.actions;
 export default listItemsSlice.reducer;

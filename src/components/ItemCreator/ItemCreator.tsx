@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import classNames from 'classnames';
 
 import { ItemCreatorButton } from './ItemCreatorButton/ItemCreatorButton';
@@ -26,7 +26,7 @@ const ItemCreator = () => {
       })}
     >
       {isActive ? (
-        <ItemCreatorForm onClick={deactivationHandler} />
+        <ItemCreatorForm isActive={isActive} onClick={deactivationHandler} />
       ) : (
         <ItemCreatorButton onClick={activationHandler} />
       )}

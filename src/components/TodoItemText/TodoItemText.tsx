@@ -1,4 +1,4 @@
-import { useState, forwardRef, Ref, ChangeEvent, useEffect, memo, useMemo } from 'react';
+import { useState, forwardRef, Ref, ChangeEvent, memo, useMemo } from 'react';
 import classNames from 'classnames';
 
 import styles from './TodoItemText.module.scss';
@@ -7,21 +7,19 @@ const cn = classNames.bind(styles);
 
 type Props = {
   isActive: boolean;
-  completed: boolean;
+  status: TaskStatusType;
   title: string;
   description: string;
-  onChange: (data: { title: string, description: string}) => void;
+  onChange: (data: { title: string; description: string }) => void;
 };
 
 const TodoItemText = memo(
   forwardRef<HTMLDivElement, Props>(
     (
-      { isActive, completed, title, description, onChange },
+      { isActive, status, title, description, onChange },
       ref?: Ref<HTMLDivElement>
     ) => {
       const [currentTitle, setCurrentTitle] = useState(title);
-
-      const [currentDescription, setCurrentDescription] = useState(description);
 
       const onTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
         event.preventDefault();
@@ -30,6 +28,8 @@ const TodoItemText = memo(
       };
 
       const [rows, setRows] = useState(1);
+
+      const [currentDescription, setCurrentDescription] = useState(description);
 
       const onDescriptionChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         event.preventDefault();
@@ -48,14 +48,12 @@ const TodoItemText = memo(
         return description !== currentDescription;
       }, [currentDescription])
 
-      useEffect(() => {
-        if (!isActive) {
-          onChange({
-            title: currentTitle,
-            description: currentDescription,
-          });
-        }
-      }, [isActive, newTitle, newDescription]);
+      const onChangeHandler = () => {
+        onChange({
+          title: currentTitle,
+          description: currentDescription,
+        });
+      };
 
       return (
         <div className={styles.text} ref={ref}>
@@ -63,23 +61,27 @@ const TodoItemText = memo(
             type='text'
             className={cn(styles.title, {
               [styles.title_active]: isActive,
-              [styles.title_completed]: completed,
+              [styles.title_completed]: status === 'completed',
+              [styles.title_missed]: status === 'missed',
             })}
             placeholder='What do you plan?'
             value={currentTitle}
-            readOnly={completed}
+            readOnly={status !== 'progress'}
             onChange={onTitleChange}
+            onBlur={onChangeHandler}
           />
           {isActive && (
             <textarea
               className={cn(styles.description, {
-                [styles.description_completed]: completed,
+                [styles.description_completed]: status === 'completed',
+                [styles.description_missed]: status === 'missed',
               })}
               placeholder='Add some details...'
               value={currentDescription}
-              readOnly={completed}
+              readOnly={status !== 'progress'}
               rows={rows}
               onChange={onDescriptionChange}
+              onBlur={onChangeHandler}
             />
           )}
         </div>

@@ -22,3 +22,18 @@
     }
   }
 }
+
+.icons,
+.buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+}
+
+.buttons {
+  padding-left: 15px;
+  padding-right: 10px;
+  border-left: 2px solid $colorUnfocused;
+}

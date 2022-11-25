@@ -2,8 +2,38 @@
 @import 'styles/vars.scss';
 
 .container {
+  width: 100%;
+  height: fit-content;
+  margin: 0;
+  padding: 0;
+}
+
+.form {
   @extend %container;
-  background-color: $colorLight;
-  box-shadow: $boxShadowNew;
+  justify-content: flex-start;
+  align-items: flex-start;
   gap: 5px;
+  width: 100%;
+  box-shadow: $boxShadowActive;
+  border-radius: 15px;
+  z-index: 1;
+
+  &:hover {
+    box-shadow: $boxShadowActive;
+  }
+}
+
+.icons,
+.buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+}
+
+.buttons {
+  padding-left: 15px;
+  padding-right: 10px;
+  border-left: 2px solid $colorUnfocused;
 }

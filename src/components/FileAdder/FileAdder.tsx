@@ -1,7 +1,6 @@
-import { FC, ChangeEvent, useState } from 'react';
-import { AttachFile, CloudUpload } from '@mui/icons-material';
+import { FC, ChangeEvent, useState, memo } from 'react';
 import classNames from 'classnames';
-
+import { StorageFirebase } from 'firebaseApp/StorageFirebase';
 import { MyIcon } from 'components';
 
 import styles from './FileAdder.module.scss';
@@ -9,37 +8,43 @@ import styles from './FileAdder.module.scss';
 const cn = classNames.bind(styles);
 
 type Props = {
-  isActive: boolean;
-  onClick: () => void;
-}
+  status: TaskStatusType;
+  file?: string | null;
+  onClick: (url: string) => void;
+};
 
-const FileAdder: FC<Props> = ({ isActive, onClick }) => {
-  const [isUploaded, setIsUploaded] = useState(0)
+const FileAdder: FC<Props> = memo(({ status, file, onClick }) => {
+  const inProgress = status === 'progress';
 
-  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
+  const [isUploaded, setIsUploaded] = useState( file ? 1 : 0)
+
+  const handleInput = async (event: ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     const uploaded = event.target.files;
-    if (uploaded) {
-      setIsUploaded(uploaded.length);
-    }
-    onClick();
+    if (!uploaded) return;
+  
+    const file = uploaded[0];
+    const newURL = await new StorageFirebase().loadFile(file);
+
+    setIsUploaded(uploaded.length); 
+    onClick(newURL);
   };
 
   return (
     <label className={styles.button}>
-      <input
-        type='file'
-        onChange={handleInput}
-        className={styles.input}
-        readOnly={!isActive}
-      />
-      <MyIcon
-        completed={!isActive}
-        textTop='files'
-        textBottom={String(isUploaded)}
-      />
+      { 
+        file 
+        ? (<a download href={file} />)
+        : (<input
+            type='file'
+            onChange={handleInput}
+            className={styles.input}
+            disabled={!inProgress}
+          />)
+      }
+      <MyIcon status={status} textTop='files' textBottom={String(isUploaded)} />
     </label>
   );
-}
+})
 
 export { FileAdder }

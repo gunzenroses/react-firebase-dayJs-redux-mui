@@ -1,0 +1,35 @@
+@import 'styles/templates.scss';
+@import 'styles/vars.scss';
+
+.button {
+  @extend %button;
+}
+
+.icon {
+  color: $colorUnfocused;
+  cursor: pointer;
+
+  &_delete {
+    &:hover {
+      color: $colorError;
+    }
+  }
+
+  &_deleteActive{
+    color: $colorError;
+  }
+
+  &_accept {
+    &:hover {
+      color: $colorSuccess;
+    }
+  }
+
+  &_acceptActive {
+    color: $colorSuccess;
+  }
+
+  &_disabled {
+    color: $colorUnfocused;
+  }
+}

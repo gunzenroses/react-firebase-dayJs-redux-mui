@@ -1,27 +1,36 @@
-import { useState } from 'react';
+import { useState, useCallback, useEffect, memo } from 'react';
 import classNames from 'classnames';
 
-import { useListItems } from 'redux/hooks';
+import { useListItems, useMyDispatch, useViewMode } from 'redux/hooks';
+import { getListItem } from 'redux/thunks/listItemsThunk';
 import { TodoItem } from "components";
 
 import styles from './TodoList.module.scss';
 
 const cn = classNames.bind(styles);
 
-const TodoList = () => {
+const TodoList = memo(() => {
 
-  const listOfItems = useListItems();
+  const dispatch = useMyDispatch();
 
-  const [activeItem, setActiveItem] = useState<number | null>(null);
+  const mode: ModeType = useViewMode();
 
-  const activateItemHandler = (id: number) => {
+  useEffect(() => {
+    dispatch(getListItem(mode));
+  }, [mode]);
+
+  const listOfItems: ListItem[] = useListItems();
+
+  const [activeItem, setActiveItem] = useState<string | null>(null);
+
+  const activateItemHandler = useCallback((id: string | null) => {
     setActiveItem(id);
-  };
+  }, []);
 
   return (
     <ul className={styles.container}>
-      {
-        listOfItems.map(item => {
+      {listOfItems.length > 0 &&
+        listOfItems.map((item) => {
           return (
             <li
               key={item.id}
@@ -29,13 +38,19 @@ const TodoList = () => {
                 [styles.listItem_active]: activeItem === item.id,
               })}
             >
-              <TodoItem item={item} activateItem={activateItemHandler} />
+              <TodoItem
+                id={item.id}
+                item={item.data}
+                isActive={activeItem === item.id}
+                // updateItem={updateItemHandler}
+                activateItem={activateItemHandler}
+              />
             </li>
           );
-        })
-      }
+        })}
+      {listOfItems.length < 1 && <div>List is empty</div>}
     </ul>
-  )
-}
+  );
+})
 
 export { TodoList };

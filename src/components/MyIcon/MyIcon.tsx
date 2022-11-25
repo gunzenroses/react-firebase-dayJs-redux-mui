@@ -6,33 +6,39 @@ import styles from './MyIcon.module.scss';
 const cn = classNames.bind(styles);
 
 type Props = {
-  completed: boolean,
   textTop: string, 
   textBottom: string,
+  status: TaskStatusType,
   onClick?: () => void;
 }
 
-const MyIcon: FC<Props> = ({ completed, textTop, textBottom, onClick }) => {
+const MyIcon: FC<Props> = ({ status, textTop, textBottom, onClick }) => {
+  const inProgress = status === 'progress';
+  const isCompleted = status === 'completed';
+  const isMissed = status === 'missed';
+
   const onButtonClickHandler = () => {
-    if (onClick && !completed) onClick();
+    if (onClick && inProgress) onClick();
   }
 
   return (
     <div
       className={cn(styles.button, {
-        [styles.button_disabled]: completed
+        [styles.button_disabled]: status !== 'progress',
       })}
       onClick={onButtonClickHandler}
     >
       <span
         className={cn(styles.icon, {
-          [styles.icon_completed]: completed,
+          [styles.icon_completed]: isCompleted,
+          [styles.icon_missed]: isMissed,
         })}
       >
         <p className={styles.textTop}>{textTop}</p>
         <p
           className={cn(styles.textBottom, {
-            [styles.textBottom_completed]: completed,
+            [styles.textBottom_completed]: isCompleted,
+            [styles.textBottom_missed]: isMissed,
           })}
         >
           {textBottom}

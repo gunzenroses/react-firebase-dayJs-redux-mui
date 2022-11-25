@@ -1,63 +1,129 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useRef, useState, useCallback, useEffect } from 'react';
+import { HighlightOff, SaveAsOutlined } from '@mui/icons-material';
 
-import { ButtonClose, TodoItemText, MyDatePicker, FileAdder } from 'components';
+import { useMyDispatch } from 'redux/hooks';
+import { addListItem } from 'redux/thunks/listItemsThunk';
+import { FileAdder, MyButton, MyDatePicker, TodoItemText } from 'components';
 
 import styles from './ItemCreatorForm.module.scss';
 
 type Props = {
+  isActive: boolean,
   onClick: () => void;
-}
+};
 
-const ItemCreatorForm: FC<Props> = ({ onClick }) => {
-  const component = useRef(null);
+const ItemCreatorForm: FC<Props> = ({ isActive, onClick }) => {
+  const dispatch = useMyDispatch();
+
+  const thisStatus = 'progress';
+
+  const closeComponent = useRef(null);
 
   useEffect(() => {
-    const deactivateForm = (e: Event) => {
+    const deactivateItemHandler = (event: Event) => {
       const muiDialog = document.getElementsByClassName('MuiPaper-root')[0];
       if (muiDialog) return;
-      const isInArea = e
+
+      const isInArea = event
         .composedPath()
-        .some(element => element === component.current);
-      if (!isInArea) onClick();
+        .some((element) => element === closeComponent.current);
+      if (!isInArea) {
+        onClick();
+      }
     };
-    document.addEventListener('pointerup', deactivateForm);
+
+    document.addEventListener('pointerdown', deactivateItemHandler);
+
     return () => {
-      document.removeEventListener('pointerup', deactivateForm);
-    }
+      document.removeEventListener('pointerdown', deactivateItemHandler);
+    };
   }, []);
 
-  const [completed, setCompleted] = useState(false);
+  const [thisText, setThisText] = useState({ title: '', description: '' });
 
-  const [title, setTitle] = useState('');
+  const changeTextHandler = useCallback(
+    (data: { title: string; description: string }) => {
+      setThisText(data);
+    }, []
+  );
 
-  const [description, setDescription] = useState('');
+  const [thisDate, setThisDate] = useState<number | null>(null);
 
-  const changeTextHandler = (data: { title: string; description: string }) => {
-    const { title, description } = data;
-    setTitle(title);
-    setDescription(description);
-  };
+  const dateChangeHandler = useCallback((day: number | null) => {
+    setThisDate(day);
+  }, []);
 
-  const closeHandler = () => {
+  const [thisFile, setThisFile] = useState<string | null>(null);
+
+  const fileAdderHandler = useCallback((imgURL: string) => {
+    setThisFile(imgURL);
+  }, []);
+
+  const closeItemHandler = () => {
     onClick();
   };
 
-  const fileAdderHandler = () => {
+  const addNewItem = () => {
+    const newItem: ItemData = {
+      status: thisStatus,
+      title: thisText.title,
+      description: thisText.description,
+      date: thisDate,
+      file: thisFile,
+    };
 
-  }
+    dispatch(addListItem(newItem));
+
+    setThisDate(null);
+    setThisFile(null);
+    setThisText({
+      title: '',
+      description: '',
+    });
+
+    onClick();
+  };
 
   return (
-    <div className={styles.container} ref={component}>
-      <TodoItemText
-        completed={completed}
-        isActive={true}
-        title={title}
-        description={description}
-        onChange={changeTextHandler}
-      />
-      <MyDatePicker completed={completed} />
-      <FileAdder isActive={true} onClick={fileAdderHandler} />
-      <ButtonClose isActive={true} onClick={closeHandler} />
+    <div
+      ref={closeComponent}
+      className={styles.container}
+    >
+      <div className={styles.form}>
+        <MyButton
+          IconTag={HighlightOff}
+          isActive={false}
+          theme='delete'
+          onClick={closeItemHandler}
+        />
+        <TodoItemText
+          status={thisStatus}
+          isActive={true}
+          title={thisText.title}
+          description={thisText.description}
+          onChange={changeTextHandler}
+        />
+        <div className={styles.icons}>
+          <MyDatePicker
+            status={thisStatus}
+            date={thisDate}
+            onChange={dateChangeHandler} 
+          />
+          <FileAdder 
+            status={thisStatus}
+            onClick={fileAdderHandler} 
+          />
+        </div>
+        <div className={styles.buttons}>
+          <MyButton
+            IconTag={SaveAsOutlined}
+            isActive={true}
+            status={thisStatus}
+            theme='accept'
+            onClick={addNewItem}
+          />
+        </div>
+      </div>
     </div>
   );
 };

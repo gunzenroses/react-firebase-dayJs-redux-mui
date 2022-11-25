@@ -22,6 +22,11 @@
   background-color: $colorMain;
 
   &_completed {
+    background-color: $colorSuccess;
+    cursor: default;
+  }
+
+  &_missed {
     background-color: $colorUnfocused;
     cursor: default;
   }
@@ -55,6 +60,11 @@
   background-color: $colorLight;
 
   &_completed {
+    border-color: $colorSuccess;
+    color: $colorSuccess;
+  }
+
+  &_missed {
     border-color: $colorUnfocused;
     color: $colorUnfocused;
   }

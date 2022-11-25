@@ -4,11 +4,10 @@ import { MoreHoriz, Clear } from '@mui/icons-material';
 
 import { useMyDispatch, useViewMode } from 'redux/hooks';
 import { changeMode } from 'redux/slices/modeSlice';
+import { modes } from 'utils/constants';
 
 import { ModeItem } from './ModeItem/ModeItem';
 import styles from './ModeList.module.scss';
-
-const modes: ModeType[] = ['All', 'Completed', 'In Progress'];
 
 const cn = classNames.bind(styles);
 

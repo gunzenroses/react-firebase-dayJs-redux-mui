@@ -6,7 +6,7 @@ import listItemsSlice from './slices/listItemsSlice';
 const MyStore = configureStore({
   reducer: {
     mode: modeSlice,
-    listItems: listItemsSlice
+    listItems: listItemsSlice,
   }
 });
 

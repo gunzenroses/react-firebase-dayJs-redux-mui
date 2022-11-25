@@ -3,16 +3,24 @@ declare module '*.scss';
 type MonthType = 'January' | 'February' | 'March' | 'April' | 'May'
   | 'June' | 'July' | 'August' | 'September' | 'November' | 'December';
 
-type ModeType = 'All' | 'Completed' | 'In Progress';
+type TaskStatusType = 'completed' | 'progress' | 'missed';
+
+type ModeType = 'All' | 'Completed' | 'In Progress' | 'Overdue';
 
 type ItemData = {
-  id: number,
-  completed: boolean;
+  status: TaskStatusType;
   title: string;
-  date: string;
+  date: number | null;
   description: string;
-  files?: any;
+  file: string | null;
 };
+
+type ListItem = {
+  id: string;
+  data: ItemData;
+};
+
+type ListItemPartial = { id: string; data: Partial<ItemData> };
 
 /** Enables basic storage and retrieval of dates and times. */
 type DateType2015 = {

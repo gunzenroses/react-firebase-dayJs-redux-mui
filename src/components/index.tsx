@@ -1,10 +1,9 @@
 export { MyIcon } from './MyIcon/MyIcon';
+export { MyButton } from './MyButton/MyButton';
 export { ButtonCalendar } from './ButtonCalendar/ButtonCalendar';
 export { MyDatePicker } from './MyDatePicker/MyDatePicker';
 export { FileAdder } from './FileAdder/FileAdder';
-export { ButtonAccept } from './ButtonAccept/ButtonAccept';
 export { ButtonCheck } from './ButtonCheck/ButtonCheck'
-export { ButtonClose } from './ButtonClose/ButtonClose';
 export { TodoItemText } from './TodoItemText/TodoItemText';
 export { TodoItem } from './TodoItem/TodoItem';
 export { TodoList } from './TodoList/TodoList';
