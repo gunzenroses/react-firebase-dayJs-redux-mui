@@ -3,21 +3,21 @@ import { HighlightOff, SaveAsOutlined } from '@mui/icons-material';
 
 import { useMyDispatch } from 'redux/hooks';
 import { addListItem } from 'redux/thunks/listItemsThunk';
-import { FileAdder, MyButton, MyDatePicker, TodoItemText } from 'components';
+import { StorageFirebase } from 'firebaseApp/StorageFirebase';
+import { FileHandler, MyButton, MyDatePicker, TodoItemText } from 'components';
 
 import styles from './ItemCreatorForm.module.scss';
 
 type Props = {
-  isActive: boolean,
   onClick: () => void;
 };
 
-const ItemCreatorForm: FC<Props> = ({ isActive, onClick }) => {
+const ItemCreatorForm: FC<Props> = ({ onClick }) => {
   const dispatch = useMyDispatch();
 
   const thisStatus = 'progress';
 
-  const closeComponent = useRef(null);
+  const areaComponent = useRef(null);
 
   useEffect(() => {
     const deactivateItemHandler = (event: Event) => {
@@ -26,7 +26,7 @@ const ItemCreatorForm: FC<Props> = ({ isActive, onClick }) => {
 
       const isInArea = event
         .composedPath()
-        .some((element) => element === closeComponent.current);
+        .some((element) => element === areaComponent.current);
       if (!isInArea) {
         onClick();
       }
@@ -53,23 +53,27 @@ const ItemCreatorForm: FC<Props> = ({ isActive, onClick }) => {
     setThisDate(day);
   }, []);
 
-  const [thisFile, setThisFile] = useState<string | null>(null);
+  const [thisFile, setThisFile] = useState<File | null>(null);
 
-  const fileAdderHandler = useCallback((imgURL: string) => {
-    setThisFile(imgURL);
+  const onUploadFileHandler = useCallback((file: File | null) => {
+    setThisFile(file);
   }, []);
 
   const closeItemHandler = () => {
     onClick();
   };
 
-  const addNewItem = () => {
+  const addNewItem = async () => {
+    const fileURL =  thisFile
+      ? await new StorageFirebase().uploadFile(thisFile)
+      : '';
+
     const newItem: ItemData = {
       status: thisStatus,
       title: thisText.title,
       description: thisText.description,
       date: thisDate,
-      file: thisFile,
+      fileURL: fileURL,
     };
 
     dispatch(addListItem(newItem));
@@ -85,10 +89,7 @@ const ItemCreatorForm: FC<Props> = ({ isActive, onClick }) => {
   };
 
   return (
-    <div
-      ref={closeComponent}
-      className={styles.container}
-    >
+    <div ref={areaComponent} className={styles.container}>
       <div className={styles.form}>
         <MyButton
           IconTag={HighlightOff}
@@ -107,11 +108,12 @@ const ItemCreatorForm: FC<Props> = ({ isActive, onClick }) => {
           <MyDatePicker
             status={thisStatus}
             date={thisDate}
-            onChange={dateChangeHandler} 
+            onChange={dateChangeHandler}
           />
-          <FileAdder 
+          <FileHandler
             status={thisStatus}
-            onClick={fileAdderHandler} 
+            fileURL={''}
+            onUploadFile={onUploadFileHandler}
           />
         </div>
         <div className={styles.buttons}>

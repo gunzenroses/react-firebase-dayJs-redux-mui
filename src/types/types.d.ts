@@ -12,7 +12,7 @@ type ItemData = {
   title: string;
   date: number | null;
   description: string;
-  file: string | null;
+  fileURL: string;
 };
 
 type ListItem = {

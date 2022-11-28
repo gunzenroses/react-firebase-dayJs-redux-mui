@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { RadioButtonUnchecked, CheckCircle, RemoveCircle } from "@mui/icons-material";
 import classNames from "classnames";
 
-import { style100 } from 'utils/constants';
+import { style100, StatusEnum } from 'utils/constants';
 import { checkTimestampInPast } from 'utils/utils';
 
 import styles from './ButtonCheck.module.scss';
@@ -17,15 +17,15 @@ type Props = {
 };
 
 const ButtonCheck: FC<Props> = ({ status, date, isActive, onChange }) => {
-  const inProgress = status === 'progress';
-  const isCompleted = status === 'completed';
-  const isMissed = status === 'missed';
+  const inProgress = status === StatusEnum.progress;
+  const isCompleted = status === StatusEnum.completed;
+  const isMissed = status === StatusEnum.missed;
 
   const isPast = checkTimestampInPast(date);
   if (isPast && !isMissed) onChange('missed');
 
   const onChangeHandler = () => {
-    onChange(status === 'completed' ? 'progress' : 'completed');
+    onChange(status === StatusEnum.completed ? 'progress' : 'completed');
   };
 
   return (

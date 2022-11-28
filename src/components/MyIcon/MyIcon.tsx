@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import classNames from 'classnames';
 
+import { StatusEnum } from 'utils/constants';
 import styles from './MyIcon.module.scss';
 
 const cn = classNames.bind(styles);
@@ -13,9 +14,9 @@ type Props = {
 }
 
 const MyIcon: FC<Props> = ({ status, textTop, textBottom, onClick }) => {
-  const inProgress = status === 'progress';
-  const isCompleted = status === 'completed';
-  const isMissed = status === 'missed';
+  const inProgress = status === StatusEnum.progress;
+  const isCompleted = status === StatusEnum.completed;
+  const isMissed = status === StatusEnum.missed;
 
   const onButtonClickHandler = () => {
     if (onClick && inProgress) onClick();

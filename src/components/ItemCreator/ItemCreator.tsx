@@ -26,7 +26,7 @@ const ItemCreator = () => {
       })}
     >
       {isActive ? (
-        <ItemCreatorForm isActive={isActive} onClick={deactivationHandler} />
+        <ItemCreatorForm onClick={deactivationHandler} />
       ) : (
         <ItemCreatorButton onClick={activationHandler} />
       )}

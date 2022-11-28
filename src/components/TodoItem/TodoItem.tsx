@@ -4,12 +4,13 @@ import classNames from "classnames";
 
 import { useMyDispatch } from 'redux/hooks';
 import { updateListItem, deleteListItem } from 'redux/thunks/listItemsThunk';
+import { StorageFirebase } from 'firebaseApp/StorageFirebase';
 import {
   ButtonCheck,
   TodoItemText,
   MyDatePicker,
   MyButton,
-  FileAdder,
+  FileHandler,
 } from 'components';
 
 import styles from './TodoItem.module.scss';
@@ -19,12 +20,12 @@ const cn = classNames.bind(styles);
 type Props = {
   id: string,
   item: ItemData;
-  isActive?: boolean;
+  isActive: boolean;
   activateItem: (id: string | null) => void;
 };
 
-const TodoItem: FC<Props> = memo(({ id, item, isActive = false, activateItem }) => {
-  const { status, title, date, description, file } = item;
+const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
+  const { status, title, date, description, fileURL } = item;
 
   const activateItemHandler = () => {
     if (!isActive) activateItem(id);
@@ -56,37 +57,43 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive = false, activateItem }) 
     setDate(day);
   }, []);
 
-  const [thisFile, setThisFile] = useState<string | null>(file);
+  const [thisFile, setThisFile] = useState<File | null>(null); 
 
-  const fileAdderHandler = useCallback((imgURL: string) => {
-    setThisFile(imgURL);
+  const onFileUploadHandler = useCallback((file: File) => {
+    setThisFile(file);
   }, []);
 
-  const [newItem, setNewItem] = useState<ItemData>(item);
+  const [updateItem, setUpdateItem] = useState(false);
 
   useEffect(() => {
-    setNewItem((oldItem) => ({
-      ...oldItem,
+    if (!isActive) return;
+    collectItemData();
+  }, [thisFile, thisStatus, thisDate, thisText, updateItem]);
+
+  const collectItemData = async () => {
+    const thisFileURL = fileURL 
+      ? fileURL
+      : (thisFile 
+          ? await new StorageFirebase().uploadFile(thisFile)
+          : '');
+
+    const currentItem: ItemData = {
       date: thisDate,
       status: thisStatus,
       title: thisText.title,
       description: thisText.description,
-    }));
-  }, [thisDate, thisText, thisStatus]);
+      fileURL: thisFileURL,
+    };
 
-  useEffect(() => {
-    if (isActive) return;
-    dispatch(updateListItem({ id, data: newItem }));
-  }, [newItem, isActive]);
-
-  const deleteItemHandler = useCallback(() => {
-    dispatch(deleteListItem(id));
-  }, []);
+    if (updateItem) {
+      console.log('after all', currentItem);
+    } else console.log('after all kwakwakwa');
+  };
 
   const closeComponent = useRef(null);
 
   useEffect(() => {
-    const deactivateItemHandler = (event: Event) => {
+    const deactivateItemHandler = async (event: Event) => {
       if (!isActive) {
         return;
       }
@@ -97,6 +104,7 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive = false, activateItem }) 
         .composedPath()
         .some((element) => element === closeComponent.current);
       if (!isInArea) {
+        setUpdateItem(true);
         activateItem(null);
       }
     };
@@ -107,6 +115,10 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive = false, activateItem }) 
       document.removeEventListener('pointerdown', deactivateItemHandler);
     };
   }, [isActive]);
+
+  const deleteItemHandler = useCallback(() => {
+    dispatch(deleteListItem(id));
+  }, []);
 
   return (
     <div
@@ -136,10 +148,10 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive = false, activateItem }) 
           onChange={changeDateHandler}
         />
         {isActive && (
-          <FileAdder
+          <FileHandler
             status={thisStatus}
-            file={thisFile}
-            onClick={fileAdderHandler}
+            fileURL={fileURL}
+            onUploadFile={onFileUploadHandler}
           />
         )}
       </div>

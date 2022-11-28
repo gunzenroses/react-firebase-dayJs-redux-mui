@@ -1,11 +1,16 @@
 import { FC } from 'react';
 import classNames from "classnames";
 
-import { style100 } from 'utils/constants';
+import { style100, StatusEnum } from 'utils/constants';
 
 import styles from './MyButton.module.scss';
 
 const cn = classNames.bind(styles);
+
+enum Theme {
+  delete = 'delete',
+  accept = 'accept',
+}
 
 type Props = {
   IconTag: any; // temp
@@ -16,9 +21,9 @@ type Props = {
 };
 
 const MyButton: FC<Props> = ({ IconTag, isActive, status, theme, onClick }) => {
-  const isMissed = status === 'missed';
-  const themeDelete = theme === 'delete';
-  const themeAccept = theme === 'accept';
+  const isMissed = status === StatusEnum.missed;
+  const themeDelete = theme === Theme.delete;
+  const themeAccept = theme === Theme.accept;
 
   const onClickHandler = () => {
     if (!isMissed) onClick();

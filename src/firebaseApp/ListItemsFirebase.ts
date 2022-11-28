@@ -10,6 +10,7 @@ import {
   query,
 } from 'firebase/firestore';
 
+import { StatusEnum } from 'utils/constants';
 import { ModeToType } from 'utils/constants';
 
 import { fireApp } from './firebaseApp';
@@ -22,40 +23,16 @@ class ListItemsFirebase {
     this.db = getFirestore(fireApp);
   }
 
-  // async getList() {
-  //   const todoListRef = collection(this.db, 'todoList');
-  //   const listSnapshot = await getDocs(todoListRef);
-  //   if (!listSnapshot.empty) {
-  //     const listIds: { id: string }[] = [];
-  //     listSnapshot.forEach((doc) => {
-  //       listIds.push({
-  //         id: doc.id,
-  //       });
-  //     });
-  //     return listIds;
-  //   }
-  //   throw new Error('Todo list is empty');
-  // }
-
-  // async getListItem(id: string) {
-  //   const todoItemRef = doc(this.db, 'todoList', id);
-  //   const todoSnap = await getDoc(todoItemRef);
-  //   if (todoSnap.exists()) {
-  //     return todoSnap.data();
-  //   }
-  //   throw new Error('Todo list is empty');
-  // }
-
   async getListItem(type: ModeType) {
     const mode: string = ModeToType[type];
     const todoListRef = collection(this.db, 'todoList');
     const todoModListRef = query(todoListRef, where('status', '==', mode));
 
-    const listSnapshot = (mode === 'all') 
-      ? await getDocs(todoListRef)
-      : await getDocs(todoModListRef);
-
-    if (listSnapshot.empty) return [];
+    const listSnapshot =
+      mode === StatusEnum.all
+        ? await getDocs(todoListRef)
+        : await getDocs(todoModListRef);
+   
     if (!listSnapshot.empty) {
       const list: ListItem[] = [];
       listSnapshot.forEach((doc) => {
@@ -65,15 +42,17 @@ class ListItemsFirebase {
         });
       });
       return list;
-    }
-    throw new Error('Todo list is empty');
+    };
+    return [] as ListItem[];
   }
 
   async updateListItem(value: { id: string; data: Partial<ItemData> }) {
+    console.log(1, value);
     const { id, data } = value;
     const todoItemRef = doc(this.db, 'todoList', id);
     try {
-      await updateDoc(todoItemRef, data);
+      const smth = await updateDoc(todoItemRef, data);
+      console.log(2, smth);
       return value;
     } catch (error) {
       throw new Error("Can't update data");

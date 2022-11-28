@@ -2,7 +2,7 @@ export { MyIcon } from './MyIcon/MyIcon';
 export { MyButton } from './MyButton/MyButton';
 export { ButtonCalendar } from './ButtonCalendar/ButtonCalendar';
 export { MyDatePicker } from './MyDatePicker/MyDatePicker';
-export { FileAdder } from './FileAdder/FileAdder';
+export { FileHandler } from './FileHandler/FileHandler';
 export { ButtonCheck } from './ButtonCheck/ButtonCheck'
 export { TodoItemText } from './TodoItemText/TodoItemText';
 export { TodoItem } from './TodoItem/TodoItem';

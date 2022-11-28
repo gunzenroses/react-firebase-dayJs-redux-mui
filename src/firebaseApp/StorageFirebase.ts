@@ -14,11 +14,26 @@ class StorageFirebase {
     this.storage = getStorage(fireApp);
   }
 
-  async loadFile(file: File) {
-    const storageRef = ref(this.storage, file.name);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-    const imgURL = await getDownloadURL(uploadTask.snapshot.ref);
-    return imgURL;
+  async uploadFile(file: File) {
+    if (!file.name) return '';
+    const name = `${file.lastModified}_${file.name}`;
+    const storageRef = ref(this.storage, name);
+    const imgURL = await uploadBytesResumable(storageRef, file)
+      .then((uploadTask) => getDownloadURL(uploadTask.ref));
+    if (typeof imgURL === 'string') {
+      return imgURL;
+    };
+    alert('Sorry, we can\'t upload the file');
+    return '';
+  }
+
+  async getFileURL () {
+    
+  }
+
+  async downloadBlob(url: string) {
+    const imgBlob = await fetch(url).then((response) => response.blob());
+    return imgBlob;
   }
 }
 

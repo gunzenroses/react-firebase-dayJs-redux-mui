@@ -1,6 +1,8 @@
 import { useState, forwardRef, Ref, ChangeEvent, memo, useMemo } from 'react';
 import classNames from 'classnames';
 
+import { StatusEnum } from 'utils/constants';
+
 import styles from './TodoItemText.module.scss';
 
 const cn = classNames.bind(styles);
@@ -61,8 +63,8 @@ const TodoItemText = memo(
             type='text'
             className={cn(styles.title, {
               [styles.title_active]: isActive,
-              [styles.title_completed]: status === 'completed',
-              [styles.title_missed]: status === 'missed',
+              [styles.title_completed]: status === StatusEnum.completed,
+              [styles.title_missed]: status === StatusEnum.missed,
             })}
             placeholder='What do you plan?'
             value={currentTitle}
@@ -73,8 +75,8 @@ const TodoItemText = memo(
           {isActive && (
             <textarea
               className={cn(styles.description, {
-                [styles.description_completed]: status === 'completed',
-                [styles.description_missed]: status === 'missed',
+                [styles.description_completed]: status === StatusEnum.completed,
+                [styles.description_missed]: status === StatusEnum.missed,
               })}
               placeholder='Add some details...'
               value={currentDescription}

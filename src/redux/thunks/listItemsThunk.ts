@@ -76,9 +76,4 @@ async (id: string, { rejectWithValue }) => {
   }
 });
 
-const uploadFile = createAsyncThunk(
-  'listItemsSlice/uploadFile',
-  async () => {}
-);
-
-export { getListItem, updateListItem, addListItem, deleteListItem, uploadFile };
+export { getListItem, updateListItem, addListItem, deleteListItem };

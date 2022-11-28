@@ -12,4 +12,11 @@ const ModeToType = {
   'Overdue': 'missed'
 }
 
-export { style100, modes, ModeToType };
+enum StatusEnum {
+  all = 'all',
+  completed = 'completed',
+  progress = 'progress',
+  missed = 'missed'
+}
+
+export { style100, modes, ModeToType, StatusEnum };
