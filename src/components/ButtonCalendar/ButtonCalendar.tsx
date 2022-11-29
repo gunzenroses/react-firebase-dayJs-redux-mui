@@ -1,5 +1,5 @@
 import { FC, memo } from 'react';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 import { MyIcon } from 'components';
 
@@ -7,9 +7,16 @@ import { Months } from './constants';
 
 type Props = {
   status: TaskStatusType;
-  day?: any;
+  day: Dayjs | null;
   onClick: () => void;
 };
+
+/**
+ * @component
+ * 
+ * @example
+ * <ButtonCalendar status='missed' day='1669305600' onClick={() => {}}/>
+ */
 
 const ButtonCalendar: FC<Props> = memo(({ status, day, onClick }) => {
   const calendarDate = day ? dayjs(day).format('DD.MM.YYYY').split('.') : null;

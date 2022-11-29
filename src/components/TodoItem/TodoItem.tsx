@@ -2,9 +2,9 @@ import { FC, memo, useState, useRef, useEffect, useCallback } from 'react';
 import { HighlightOff } from '@mui/icons-material';
 import classNames from "classnames";
 
+import { StorageFirebase } from 'firebaseApp/StorageFirebase';
 import { useMyDispatch } from 'redux/hooks';
 import { updateListItem, deleteListItem } from 'redux/thunks/listItemsThunk';
-import { StorageFirebase } from 'firebaseApp/StorageFirebase';
 import {
   ButtonCheck,
   TodoItemText,
@@ -12,6 +12,7 @@ import {
   MyButton,
   FileHandler,
 } from 'components';
+import { checkTimestampInPast } from 'utils/utils';
 
 import styles from './TodoItem.module.scss';
 
@@ -25,19 +26,25 @@ type Props = {
 };
 
 const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
-  const { status, title, date, description, fileURL } = item;
+  const dispatch = useMyDispatch();
 
   const activateItemHandler = () => {
     if (!isActive) activateItem(id);
   };
 
-  const dispatch = useMyDispatch();
+  const { status, title, date, description, fileURL } = item;
+
+  const isPast = checkTimestampInPast(date);
+
+  if (isPast && status !== 'missed') {
+    dispatch(updateListItem({ id, data: { status: 'missed' }}));
+  }
 
   const [thisStatus, setStatus] = useState(status);
 
-  const changeStatusHandler = useCallback((newStatus: TaskStatusType) => {
+  const changeStatusHandler = (newStatus: TaskStatusType) => {
     setStatus(newStatus);
-  }, []);
+  };
 
   const [thisText, setText] = useState<{ title: string; description: string }>({
     title,
@@ -47,9 +54,7 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
   const changeTextHandler = useCallback(
     (data: { title: string; description: string }) => {
       setText(data);
-    },
-    []
-  );
+    }, []);
 
   const [thisDate, setDate] = useState<number | null>(date);
 
@@ -59,37 +64,37 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
 
   const [thisFile, setThisFile] = useState<File | null>(null); 
 
-  const onFileUploadHandler = useCallback((file: File) => {
+  const onUploadFileHandler = useCallback((file: File) => {
     setThisFile(file);
   }, []);
 
   const [updateItem, setUpdateItem] = useState(false);
 
-  useEffect(() => {
-    if (!isActive) return;
-    collectItemData();
-  }, [thisFile, thisStatus, thisDate, thisText, updateItem]);
-
   const collectItemData = async () => {
-    const thisFileURL = fileURL 
+    if (updateItem) {
+      const thisFileURL = fileURL 
       ? fileURL
       : (thisFile 
           ? await new StorageFirebase().uploadFile(thisFile)
           : '');
 
-    const currentItem: ItemData = {
-      date: thisDate,
-      status: thisStatus,
-      title: thisText.title,
-      description: thisText.description,
-      fileURL: thisFileURL,
-    };
-
-    if (updateItem) {
-      console.log('after all', currentItem);
-    } else console.log('after all kwakwakwa');
+      const currentItem: ItemData = {
+        date: thisDate,
+        status: thisStatus,
+        title: thisText.title,
+        description: thisText.description,
+        fileURL: thisFileURL,
+      };
+      
+      dispatch(updateListItem({ id, data: currentItem }));
+    }
   };
 
+  useEffect(() => {
+    if (!isActive) return;
+    collectItemData();
+  }, [thisFile, thisStatus, thisDate, thisText, updateItem]);
+  
   const closeComponent = useRef(null);
 
   useEffect(() => {
@@ -116,9 +121,12 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
     };
   }, [isActive]);
 
-  const deleteItemHandler = useCallback(() => {
+  const deleteItemHandler = useCallback(async () => {
+    if (fileURL) {
+      await new StorageFirebase().deleteFile(fileURL);
+    }
     dispatch(deleteListItem(id));
-  }, []);
+  }, [dispatch, fileURL, id]);
 
   return (
     <div
@@ -129,7 +137,6 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
       onClick={activateItemHandler}
     >
       <ButtonCheck
-        date={thisDate}
         status={thisStatus}
         isActive={isActive}
         onChange={changeStatusHandler}
@@ -151,7 +158,7 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
           <FileHandler
             status={thisStatus}
             fileURL={fileURL}
-            onUploadFile={onFileUploadHandler}
+            onUploadFile={onUploadFileHandler}
           />
         )}
       </div>

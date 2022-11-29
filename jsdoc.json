@@ -1,0 +1,35 @@
+{
+  "source": {
+    "include": ["src/components", "src/firebaseApp", "src/utils"],
+    "includePattern": "\\.(jsx|js|ts|tsx)$",
+    "excludePatterns": [
+      "(node_modules/|docs|public)",
+      "src/styles",
+      "src/redux",
+      "src/types",
+      ".d.ts$"
+    ]
+  },
+  "plugins": [
+    "plugins/markdown", 
+    "node_modules/better-docs/typescript",
+    "node_modules/better-docs/component"
+  ],
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": true,
+    "better-docs": {
+      "component": {
+        "wrapper": "./src/components/App/App.tsx"
+      }
+    }
+  },
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "opts": {
+    "name": "my project",
+    "recurse": true,
+    "destination": "./docs/"
+  }
+}

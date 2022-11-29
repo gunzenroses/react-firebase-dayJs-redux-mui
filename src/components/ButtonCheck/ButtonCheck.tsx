@@ -3,7 +3,6 @@ import { RadioButtonUnchecked, CheckCircle, RemoveCircle } from "@mui/icons-mate
 import classNames from "classnames";
 
 import { style100, StatusEnum } from 'utils/constants';
-import { checkTimestampInPast } from 'utils/utils';
 
 import styles from './ButtonCheck.module.scss';
 
@@ -11,18 +10,14 @@ const cn = classNames.bind(styles);
 
 type Props = {
   status: TaskStatusType;
-  date: number | null;
   isActive: boolean;
   onChange: (newStatus: TaskStatusType) => void;
 };
 
-const ButtonCheck: FC<Props> = ({ status, date, isActive, onChange }) => {
+const ButtonCheck: FC<Props> = ({ status, isActive, onChange }) => {
   const inProgress = status === StatusEnum.progress;
   const isCompleted = status === StatusEnum.completed;
   const isMissed = status === StatusEnum.missed;
-
-  const isPast = checkTimestampInPast(date);
-  if (isPast && !isMissed) onChange('missed');
 
   const onChangeHandler = () => {
     onChange(status === StatusEnum.completed ? 'progress' : 'completed');

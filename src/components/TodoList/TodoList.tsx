@@ -42,7 +42,6 @@ const TodoList = memo(() => {
                 id={item.id}
                 item={item.data}
                 isActive={activeItem === item.id}
-                // updateItem={updateItemHandler}
                 activateItem={activateItemHandler}
               />
             </li>

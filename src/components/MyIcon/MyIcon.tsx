@@ -2,6 +2,7 @@ import { FC } from 'react';
 import classNames from 'classnames';
 
 import { StatusEnum } from 'utils/constants';
+
 import styles from './MyIcon.module.scss';
 
 const cn = classNames.bind(styles);

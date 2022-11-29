@@ -1,5 +1,6 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import classNames from "classnames";
+import { SvgIconComponent } from '@mui/icons-material';
 
 import { style100, StatusEnum } from 'utils/constants';
 
@@ -13,14 +14,14 @@ enum Theme {
 }
 
 type Props = {
-  IconTag: any; // temp
+  IconTag: SvgIconComponent;
   isActive?: boolean;
   status?: TaskStatusType;
   theme?: string;
   onClick: () => void;
 };
 
-const MyButton: FC<Props> = ({ IconTag, isActive, status, theme, onClick }) => {
+const MyButton: FC<Props> = memo(({ IconTag, isActive, status, theme, onClick }) => {
   const isMissed = status === StatusEnum.missed;
   const themeDelete = theme === Theme.delete;
   const themeAccept = theme === Theme.accept;
@@ -47,6 +48,6 @@ const MyButton: FC<Props> = ({ IconTag, isActive, status, theme, onClick }) => {
       />
     </button>
   );
-};
+});
 
 export { MyButton };

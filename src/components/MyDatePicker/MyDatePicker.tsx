@@ -1,13 +1,10 @@
 import { FC, useEffect, useRef, useState, memo } from 'react';
-import { useDispatch } from 'react-redux';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers';
 import { TextField } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 
-import { updateListItem } from 'redux/thunks/listItemsThunk';
-import { checkTimestampInPast } from 'utils/utils';
 import { ButtonCalendar } from 'components';
 
 import styles from './MyDatePicker.module.scss';
