@@ -1,7 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { _ActionCreatorWithPreparedPayload } from "@reduxjs/toolkit/dist/createAction";
 
-import ListItemsFirebase from 'firebaseApp/ListItemsFirebase';
+import { ListItemsFirebase } from 'firebaseApp/ListItemsFirebase';
+import { StorageFirebase } from "firebaseApp/StorageFirebase";
 
 interface MyError {
   message: string;
@@ -24,20 +25,38 @@ const getListItem = createAsyncThunk<
 
 const updateListItem = createAsyncThunk<
   ListItemPartial,
-  ListItemPartial,
+  ListItemUpdateData,
   { rejectValue: MyError }
 >(
   'listItemsSlice/updateListItem',
-  async (
-    value: ListItemPartial,
-    { rejectWithValue }
-  ) => {
+  async (value: ListItemUpdateData, { rejectWithValue }) => {
     try {
-      const partialData = await new ListItemsFirebase().updateListItem(value);
+      const newURL: string | null =
+        typeof value.fileInfo === 'string'
+          ? value.fileInfo
+          : ( 
+              typeof value.fileInfo === 'undefined'
+                ? null
+                : await new StorageFirebase().uploadFile(value.fileInfo)
+            );
+
+      const fileURLData = (typeof newURL === 'string') ? {
+        fileURL: newURL
+      } : null;
+      
+      const newData: ListItemPartial = {
+        id: value.id,
+        data: {
+          ...value.data,
+          ...fileURLData,
+        },
+      };
+
+      const partialData = await new ListItemsFirebase().updateListItem(newData);
       return partialData;
     } catch (error) {
       const errorWithMessage =
-      error instanceof Error ? error : new Error("Can't update item");
+        error instanceof Error ? error : new Error("Can't update item");
       return rejectWithValue(errorWithMessage);
     }
   }
@@ -45,29 +64,41 @@ const updateListItem = createAsyncThunk<
 
 const addListItem = createAsyncThunk<
   ListItem,
-  ItemData,
+  ItemDataRaw,
   { rejectValue: MyError }
 >(
-  'listItemsSlice/addListItem', 
-  async(data: ItemData, { rejectWithValue }) => {
-    try {
-      const newItem = await new ListItemsFirebase().addListItem(data);
-      return newItem;
-    } catch (error) {
-      const errorWithMessage =
-        error instanceof Error ? error : new Error("Can't add new item");
-      return rejectWithValue(errorWithMessage);
-    }
-});
+  'listItemsSlice/addListItem',
+  async (data: ItemDataRaw, { rejectWithValue }) => {
+      return new StorageFirebase().uploadFile(data.file)
+        .then((fileURL) =>  {
+          const fullItem: ItemData = {
+            status: data.status,
+            title: data.title,
+            description: data.description,
+            fileURL: fileURL,
+            date: data.date,
+          };
+          return fullItem;
+        })
+        .then((fullItem) => new ListItemsFirebase().addListItem(fullItem))
+        .catch((error) => {
+          const errorWithMessage = error instanceof Error 
+            ? error 
+            : new Error("Can't add new item");
+          return rejectWithValue(errorWithMessage);
+        })
+  }
+);
 
 const deleteListItem = createAsyncThunk<
   string,
-  string,
+  { id: string, fileURL: string },
   { rejectValue: MyError }
 >('listItemsSlice/deleteListItem', 
-async (id: string, { rejectWithValue }) => {
+async (data: {id: string, fileURL: string }, { rejectWithValue }) => {
   try {
-    const deletedID = await new ListItemsFirebase().deleteItem(id);
+    if (data.fileURL !== '') await new StorageFirebase().deleteFile(data.fileURL);
+    const deletedID = await new ListItemsFirebase().deleteItem(data.id);
     return deletedID;
   } catch (error) {
     const errorWithMessage =

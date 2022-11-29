@@ -1,4 +1,12 @@
-import { useState, forwardRef, Ref, ChangeEvent, memo, useMemo } from 'react';
+import {
+  FC,
+  useRef,
+  useState,
+  useEffect,
+  ChangeEvent,
+  memo,
+  FocusEvent,
+} from 'react';
 import classNames from 'classnames';
 
 import { StatusEnum } from 'utils/constants';
@@ -12,15 +20,26 @@ type Props = {
   status: TaskStatusType;
   title: string;
   description: string;
-  onChange: (data: { title: string; description: string }) => void;
+  onChange: (data: UpdateItem<'title' | 'description'>) => void;
 };
 
-const TodoItemText = memo(
-  forwardRef<HTMLDivElement, Props>(
-    (
-      { isActive, status, title, description, onChange },
-      ref?: Ref<HTMLDivElement>
-    ) => {
+const TodoItemText: FC<Props> = memo( 
+  ({ isActive, status, title, description, onChange }) => {
+      const [rows, setRows] = useState(1);
+
+      const linesInDescription = (element: HTMLTextAreaElement) => {
+        const value = element.value;
+        const lines = value.split(/\r|\r\n|\n/).length;
+        return lines;
+      }
+
+      const descRef = useRef(null);
+
+      useEffect(() => {
+        if (!isActive) return;
+        if (descRef.current) setRows(linesInDescription(descRef.current));
+      }, [descRef, isActive]);
+
       const [currentTitle, setCurrentTitle] = useState(title);
 
       const onTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -29,36 +48,37 @@ const TodoItemText = memo(
         setCurrentTitle(value);
       };
 
-      const [rows, setRows] = useState(1);
-
       const [currentDescription, setCurrentDescription] = useState(description);
 
       const onDescriptionChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         event.preventDefault();
         const that = event.target;
-        const value = that.value;
-        const lines = value.split(/\r|\r\n|\n/).length;
-        setRows(lines);
-        setCurrentDescription(value);
+        setRows(linesInDescription(that));
+        setCurrentDescription(that.value);
       };
 
-      const newTitle = useMemo(() => {
-        return title !== currentTitle;
-      }, [currentTitle]);
-
-      const newDescription = useMemo(() => {
-        return description !== currentDescription;
-      }, [currentDescription])
-
-      const onChangeHandler = () => {
-        onChange({
-          title: currentTitle,
-          description: currentDescription,
-        });
+      const onChangeHandler = (
+        event: FocusEvent<HTMLTextAreaElement> | FocusEvent<HTMLInputElement>
+      ) => {
+        if (event.target.name === 'title') {
+          if (title !== currentTitle) {
+            onChange({
+              name: 'title',
+              value: currentTitle
+            })
+          }
+        } else if (event.target.name === 'description') {
+          if (description !== currentDescription) {
+            onChange({
+              name: 'description',
+              value: currentDescription
+            })
+          }
+        }
       };
 
       return (
-        <div className={styles.text} ref={ref}>
+        <div className={styles.text}>
           <input
             type='text'
             className={cn(styles.title, {
@@ -68,18 +88,21 @@ const TodoItemText = memo(
             })}
             placeholder='What do you plan?'
             value={currentTitle}
+            name='title'
             readOnly={status !== 'progress'}
             onChange={onTitleChange}
             onBlur={onChangeHandler}
           />
           {isActive && (
             <textarea
+              ref={descRef}
               className={cn(styles.description, {
                 [styles.description_completed]: status === StatusEnum.completed,
                 [styles.description_missed]: status === StatusEnum.missed,
               })}
               placeholder='Add some details...'
               value={currentDescription}
+              name='description'
               readOnly={status !== 'progress'}
               rows={rows}
               onChange={onDescriptionChange}
@@ -89,7 +112,6 @@ const TodoItemText = memo(
         </div>
       );
     }
-  )
 );
 
 export { TodoItemText };

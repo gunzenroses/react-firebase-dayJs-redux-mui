@@ -11,7 +11,7 @@ const cn = classNames.bind(styles);
 type Props = {
   status: TaskStatusType;
   isActive: boolean;
-  onChange: (newStatus: TaskStatusType) => void;
+  onChange: (data: UpdateItem<'status'>) => void;
 };
 
 const ButtonCheck: FC<Props> = ({ status, isActive, onChange }) => {
@@ -20,7 +20,10 @@ const ButtonCheck: FC<Props> = ({ status, isActive, onChange }) => {
   const isMissed = status === StatusEnum.missed;
 
   const onChangeHandler = () => {
-    onChange(status === StatusEnum.completed ? 'progress' : 'completed');
+    onChange({
+      name: 'status',
+      value: status === StatusEnum.completed ? 'progress' : 'completed'
+    });
   };
 
   return (

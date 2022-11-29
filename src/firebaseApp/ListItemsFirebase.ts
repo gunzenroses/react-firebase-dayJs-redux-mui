@@ -108,4 +108,4 @@ class ListItemsFirebase {
   }
 }
 
-export default ListItemsFirebase;
+export { ListItemsFirebase };

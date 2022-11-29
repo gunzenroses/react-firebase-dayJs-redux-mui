@@ -28,8 +28,8 @@ class StorageFirebase {
    * @param {File} file - what should be uploaded on storage.
    * @returns {string} - returns data with file URL.
    */
-  async uploadFile(file: File) {
-    if (!file.name) return '';
+  async uploadFile(file: File | null) {
+    if (file === null) return '';
     const name = `${dayjs().unix()}_${file.name}`;
     const storageRef = ref(this.storage, name);
     const imgURL = await uploadBytesResumable(storageRef, file).then(
@@ -63,7 +63,7 @@ class StorageFirebase {
    */
   async deleteFile(url: string) {
     const currentRef = ref(this.storage, url);
-    deleteObject(currentRef);
+    if (currentRef) deleteObject(currentRef);
   }
 }
 

@@ -12,7 +12,7 @@ import styles from './MyDatePicker.module.scss';
 type Props = {
   status: TaskStatusType;
   date: number | null;
-  onChange: (calendarDate: number) => void;
+  onChange: (data: UpdateItem<'date'>) => void;
 };
 
 const MyDatePicker: FC<Props> = memo(({ status, date, onChange }) => {
@@ -26,9 +26,14 @@ const MyDatePicker: FC<Props> = memo(({ status, date, onChange }) => {
     }, [date]);
 
     const calendarDateHandler = (date: Dayjs | null) => {
-      setCalendarDate(date);
-      onChange(dayjs(date).unix());
-      setIsOpen(false);
+      if (date !== calendarDate) {
+        setCalendarDate(date);
+        onChange({
+          name: 'date',
+          value: dayjs(date).unix()
+        });
+        setIsOpen(false);
+      };
     };
 
     const [isOpen, setIsOpen] = useState(false);

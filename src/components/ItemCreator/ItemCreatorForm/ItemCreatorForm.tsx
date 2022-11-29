@@ -3,7 +3,6 @@ import { HighlightOff, SaveAsOutlined } from '@mui/icons-material';
 
 import { useMyDispatch } from 'redux/hooks';
 import { addListItem } from 'redux/thunks/listItemsThunk';
-import { StorageFirebase } from 'firebaseApp/StorageFirebase';
 import { FileHandler, MyButton, MyDatePicker, TodoItemText } from 'components';
 
 import styles from './ItemCreatorForm.module.scss';
@@ -12,10 +11,16 @@ type Props = {
   onClick: () => void;
 };
 
+const newItemData: ItemDataRaw = {
+  status: 'progress',
+  title: '',
+  description: '',
+  date: null,
+  file: null
+}
+
 const ItemCreatorForm: FC<Props> = ({ onClick }) => {
   const dispatch = useMyDispatch();
-
-  const thisStatus = 'progress';
 
   const areaComponent = useRef(null);
 
@@ -39,54 +44,32 @@ const ItemCreatorForm: FC<Props> = ({ onClick }) => {
     };
   }, []);
 
-  const [thisText, setThisText] = useState({ title: '', description: '' });
-
-  const changeTextHandler = useCallback(
-    (data: { title: string; description: string }) => {
-      setThisText(data);
-    }, []
-  );
-
-  const [thisDate, setThisDate] = useState<number | null>(null);
-
-  const dateChangeHandler = useCallback((day: number | null) => {
-    setThisDate(day);
-  }, []);
-
-  const [thisFile, setThisFile] = useState<File | null>(null);
-
-  const onUploadFileHandler = useCallback((file: File | null) => {
-    setThisFile(file);
-  }, []);
-
   const closeItemHandler = () => {
     onClick();
   };
 
-  const addNewItem = async () => {
-    const fileURL =  thisFile
-      ? await new StorageFirebase().uploadFile(thisFile)
-      : '';
+  const [canUpload, setCanUpload] = useState(false);
 
-    const newItem: ItemData = {
-      status: thisStatus,
-      title: thisText.title,
-      description: thisText.description,
-      date: thisDate,
-      fileURL: fileURL,
-    };
+  const [thisItem, setThisItem] = useState<ItemDataRaw>(newItemData);
 
-    dispatch(addListItem(newItem));
+  const changeItemHandler = useCallback((data: UploadItem<keyof ItemDataRaw>) => {
+    setThisItem((oldData) => ({
+      ...oldData,
+      [data.name]: data.value,
+    }));
+  }, []);
 
-    setThisDate(null);
-    setThisFile(null);
-    setThisText({
-      title: '',
-      description: '',
-    });
-
-    onClick();
-  };
+  useEffect(() => {
+    if (!canUpload) return;
+    if (thisItem.title === '') { 
+      setCanUpload(false);
+      setThisItem(newItemData);
+      onClick();
+    } else {
+      dispatch(addListItem(thisItem));
+      setThisItem(newItemData);
+    }
+  }, [canUpload, thisItem]);
 
   return (
     <div ref={areaComponent} className={styles.container}>
@@ -98,31 +81,31 @@ const ItemCreatorForm: FC<Props> = ({ onClick }) => {
           onClick={closeItemHandler}
         />
         <TodoItemText
-          status={thisStatus}
+          status={thisItem.status}
           isActive={true}
-          title={thisText.title}
-          description={thisText.description}
-          onChange={changeTextHandler}
+          title={thisItem.title}
+          description={thisItem.description}
+          onChange={changeItemHandler}
         />
         <div className={styles.icons}>
           <MyDatePicker
-            status={thisStatus}
-            date={thisDate}
-            onChange={dateChangeHandler}
+            status={thisItem.status}
+            date={thisItem.date}
+            onChange={changeItemHandler}
           />
           <FileHandler
-            status={thisStatus}
+            status={thisItem.status}
             fileURL={''}
-            onUploadFile={onUploadFileHandler}
+            onUploadFile={changeItemHandler}
           />
         </div>
         <div className={styles.buttons}>
           <MyButton
             IconTag={SaveAsOutlined}
             isActive={true}
-            status={thisStatus}
+            status={thisItem.status}
             theme='accept'
-            onClick={addNewItem}
+            onClick={() => { setCanUpload(true) }}
           />
         </div>
       </div>

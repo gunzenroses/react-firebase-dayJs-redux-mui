@@ -1,8 +1,7 @@
 import { FC, memo, useState, useRef, useEffect, useCallback } from 'react';
-import { HighlightOff } from '@mui/icons-material';
+import { HighlightOff, SaveAsOutlined } from '@mui/icons-material';
 import classNames from "classnames";
 
-import { StorageFirebase } from 'firebaseApp/StorageFirebase';
 import { useMyDispatch } from 'redux/hooks';
 import { updateListItem, deleteListItem } from 'redux/thunks/listItemsThunk';
 import {
@@ -32,69 +31,57 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
     if (!isActive) activateItem(id);
   };
 
-  const { status, title, date, description, fileURL } = item;
+  const { status, date, fileURL } = item;
 
   const isPast = checkTimestampInPast(date);
 
   if (isPast && status !== 'missed') {
-    dispatch(updateListItem({ id, data: { status: 'missed' }}));
+    dispatch(updateListItem({ 
+      id, 
+      data: { status: 'missed' }
+    }));
   }
 
-  const [thisStatus, setStatus] = useState(status);
+  const [canUpload, setCanUpload] = useState(false);
 
-  const changeStatusHandler = (newStatus: TaskStatusType) => {
-    setStatus(newStatus);
-  };
+  const [thisItem, setThisItem] = useState<ItemData & { file?: File | null }>(
+    item
+  );
 
-  const [thisText, setText] = useState<{ title: string; description: string }>({
-    title,
-    description,
-  });
-
-  const changeTextHandler = useCallback(
-    (data: { title: string; description: string }) => {
-      setText(data);
-    }, []);
-
-  const [thisDate, setDate] = useState<number | null>(date);
-
-  const changeDateHandler = useCallback((day: number) => {
-    setDate(day);
-  }, []);
-
-  const [thisFile, setThisFile] = useState<File | null>(null); 
-
-  const onUploadFileHandler = useCallback((file: File) => {
-    setThisFile(file);
-  }, []);
-
-  const [updateItem, setUpdateItem] = useState(false);
-
-  const collectItemData = async () => {
-    if (updateItem) {
-      const thisFileURL = fileURL 
-      ? fileURL
-      : (thisFile 
-          ? await new StorageFirebase().uploadFile(thisFile)
-          : '');
-
-      const currentItem: ItemData = {
-        date: thisDate,
-        status: thisStatus,
-        title: thisText.title,
-        description: thisText.description,
-        fileURL: thisFileURL,
-      };
-      
-      dispatch(updateListItem({ id, data: currentItem }));
-    }
+  const changeItemHandler = (
+    data: UpdateItem<keyof ItemData> | UploadItem<keyof ItemDataRaw>
+  ) => {
+    console.log(data);
+    setThisItem((oldData) => ({
+      ...oldData,
+      [data.name]: data.value,
+    }));
   };
 
   useEffect(() => {
-    if (!isActive) return;
-    collectItemData();
-  }, [thisFile, thisStatus, thisDate, thisText, updateItem]);
-  
+    if (!canUpload) return;
+    if (thisItem.title === '') {
+      setCanUpload(false);
+      setThisItem(item);
+      activateItem(null);
+    } else {
+      const fileInfo = fileURL ? fileURL : thisItem.file;
+      dispatch(
+        updateListItem({
+          id,
+          data: {
+            status: thisItem.status,
+            title: thisItem.title,
+            description: thisItem.description,
+            date: thisItem.date,
+          },
+          fileInfo: fileInfo,
+        })
+      );
+      setCanUpload(false);
+    }
+  }, [thisItem, canUpload]);
+
   const closeComponent = useRef(null);
 
   useEffect(() => {
@@ -109,7 +96,7 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
         .composedPath()
         .some((element) => element === closeComponent.current);
       if (!isInArea) {
-        setUpdateItem(true);
+        setThisItem(item);
         activateItem(null);
       }
     };
@@ -122,10 +109,7 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
   }, [isActive]);
 
   const deleteItemHandler = useCallback(async () => {
-    if (fileURL) {
-      await new StorageFirebase().deleteFile(fileURL);
-    }
-    dispatch(deleteListItem(id));
+    dispatch(deleteListItem({ id, fileURL }))
   }, [dispatch, fileURL, id]);
 
   return (
@@ -137,28 +121,28 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
       onClick={activateItemHandler}
     >
       <ButtonCheck
-        status={thisStatus}
+        status={thisItem.status}
         isActive={isActive}
-        onChange={changeStatusHandler}
+        onChange={changeItemHandler}
       />
       <TodoItemText
-        status={thisStatus}
+        status={thisItem.status}
         isActive={isActive}
-        title={thisText.title}
-        description={thisText.description}
-        onChange={changeTextHandler}
+        title={thisItem.title}
+        description={thisItem.description}
+        onChange={changeItemHandler}
       />
       <div className={styles.icons}>
         <MyDatePicker
-          status={thisStatus}
-          date={thisDate}
-          onChange={changeDateHandler}
+          status={thisItem.status}
+          date={thisItem.date}
+          onChange={changeItemHandler}
         />
         {isActive && (
           <FileHandler
-            status={thisStatus}
+            status={thisItem.status}
             fileURL={fileURL}
-            onUploadFile={onUploadFileHandler}
+            onUploadFile={changeItemHandler}
           />
         )}
       </div>
@@ -169,6 +153,15 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
           theme='delete'
           onClick={deleteItemHandler}
         />
+        {isActive && (
+          <MyButton
+            IconTag={SaveAsOutlined}
+            isActive={true}
+            status={thisItem.status}
+            theme='accept'
+            onClick={() => { setCanUpload(true) }}
+          />)
+        }
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ import styles from './FileHandler.module.scss';
 type Props = {
   status: TaskStatusType;
   fileURL: string;
-  onUploadFile: ( file: File) => void;
+  onUploadFile: (data: UploadItem<'file'>) => void;
 };
 
 const FileHandler: FC<Props> = ({ status, fileURL, onUploadFile }) => {
@@ -25,7 +25,10 @@ const FileHandler: FC<Props> = ({ status, fileURL, onUploadFile }) => {
     const file = uploaded[0];
     if (file) { 
       setUploadText('1');
-      onUploadFile(file); 
+      onUploadFile({
+        name: 'file',
+        value: file
+      }); 
     }
   };
 
