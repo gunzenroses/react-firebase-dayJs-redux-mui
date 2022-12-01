@@ -1,17 +1,12 @@
 import {
   updateDoc,
   doc,
-  where,
   addDoc,
   getDocs,
   deleteDoc,
   collection,
-  getFirestore,
-  query,
+  getFirestore
 } from 'firebase/firestore';
-
-import { StatusEnum } from 'utils/constants';
-import { ModeToType } from 'utils/constants';
 
 import { fireApp } from './firebaseApp';
 
@@ -32,18 +27,11 @@ class ListItemsFirebase {
 
   /**
    * Get data of Todo Items list (as list of documents in 'todoList' collection Firestore).
-   * @param {ModeType} type - determine which type of items ('in progress' | 'missed' | 'completed') should be rendered.
    * @returns {ListItem[]}.
    */
-  async getListItem(type: ModeType) {
-    const mode: string = ModeToType[type];
+  async getListItem() {
     const todoListRef = collection(this.db, 'todoList');
-    const todoModListRef = query(todoListRef, where('status', '==', mode));
-
-    const listSnapshot =
-      mode === StatusEnum.all
-        ? await getDocs(todoListRef)
-        : await getDocs(todoModListRef);
+    const listSnapshot = await getDocs(todoListRef);
 
     if (!listSnapshot.empty) {
       const list: ListItem[] = [];

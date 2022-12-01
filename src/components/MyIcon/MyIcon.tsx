@@ -7,12 +7,36 @@ import styles from './MyIcon.module.scss';
 
 const cn = classNames.bind(styles);
 
+/** 
+ * @description Properties required for MyIcon component
+ * @type {Props}
+*/
 type Props = {
   textTop: string, 
   textBottom: string,
   status: TaskStatusType,
   onClick?: () => void;
 }
+
+/**
+ * @component
+ * @description Component draw a Custom button, which:
+ * - represent a basic information;
+ * - toggles on/off.
+ * @param {Props} MyIconProps
+ * @returns {ReactElement}
+ * 
+ * @example 
+ * return (
+ *     <MyIcon 
+ *       status='progress' 
+ *       textTop='hey' 
+ *       textBottom='you' 
+ *       onClick={()=>{}}
+ *     />
+ * )
+ * 
+*/
 
 const MyIcon: FC<Props> = ({ status, textTop, textBottom, onClick }) => {
   const inProgress = status === StatusEnum.progress;

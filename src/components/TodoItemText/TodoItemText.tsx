@@ -15,6 +15,10 @@ import styles from './TodoItemText.module.scss';
 
 const cn = classNames.bind(styles);
 
+/** 
+ * @description Properties required for TodoItemText component
+ * @type {Props}
+*/
 type Props = {
   isActive: boolean;
   status: TaskStatusType;
@@ -22,6 +26,25 @@ type Props = {
   description: string;
   onChange: (data: UpdateItem<'title' | 'description'>) => void;
 };
+
+/**
+ * @component
+ * @description Component represents 'Title' and 'Description' fields of TodoItem.
+ * @param {Props} TodoItemTextProps
+ * @returns {ReactElement}
+ * 
+ * @example 
+ * return (
+ *     <TodoItemText 
+ *       isActive=true 
+ *       status='progress' 
+ *       title='Main task' 
+ *       description='small steps' 
+ *       onClick={()=>{}} 
+ *     />
+ * )
+ * 
+*/
 
 const TodoItemText: FC<Props> = memo( 
   ({ isActive, status, title, description, onChange }) => {

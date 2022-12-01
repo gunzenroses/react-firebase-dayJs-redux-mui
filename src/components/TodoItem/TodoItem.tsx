@@ -17,12 +17,40 @@ import styles from './TodoItem.module.scss';
 
 const cn = classNames.bind(styles);
 
+/** 
+ * @description Properties required for TodoItem component
+ * @type {Props}
+*/
 type Props = {
   id: string,
   item: ItemData;
   isActive: boolean;
   activateItem: (id: string | null) => void;
 };
+
+/**
+ * @component
+ * @description Component renders TodoItem
+ * @param {Props} TodoItemProps
+ * @returns {ReactElement}
+ * 
+ * @example 
+ * return (
+ *     <TodoItem 
+ *        id='123123' 
+ *        item={
+ *          status: 'completed',
+ *          title: 'todoItem title',
+ *          description: 'done!',
+ *          date: null,
+ *          fileURL: 'https://mock-url'
+ *        } 
+ *        isActive='true' 
+ *        activateItem={('122122')=>{}} 
+ *      />
+ * )
+ * 
+*/
 
 const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
   const dispatch = useMyDispatch();
@@ -51,7 +79,6 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
   const changeItemHandler = (
     data: UpdateItem<keyof ItemData> | UploadItem<keyof ItemDataRaw>
   ) => {
-    console.log(data);
     setThisItem((oldData) => ({
       ...oldData,
       [data.name]: data.value,
@@ -61,8 +88,6 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
   useEffect(() => {
     if (!canUpload) return;
     if (thisItem.title === '') {
-      setCanUpload(false);
-      setThisItem(item);
       activateItem(null);
     } else {
       const fileInfo = fileURL ? fileURL : thisItem.file;
@@ -78,9 +103,9 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
           fileInfo: fileInfo,
         })
       );
-      setCanUpload(false);
     }
-  }, [thisItem, canUpload]);
+    setCanUpload(false);
+  }, [dispatch, thisItem, canUpload]);
 
   const closeComponent = useRef(null);
 
@@ -96,7 +121,7 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
         .composedPath()
         .some((element) => element === closeComponent.current);
       if (!isInArea) {
-        setThisItem(item);
+        setCanUpload(true);
         activateItem(null);
       }
     };
@@ -149,19 +174,21 @@ const TodoItem: FC<Props> = memo(({ id, item, isActive, activateItem }) => {
       <div className={styles.buttons}>
         <MyButton
           IconTag={HighlightOff}
-          isActive={false}
+          isActive={isActive}
           theme='delete'
           onClick={deleteItemHandler}
         />
         {isActive && (
           <MyButton
             IconTag={SaveAsOutlined}
-            isActive={true}
+            isActive={isActive}
             status={thisItem.status}
             theme='accept'
-            onClick={() => { setCanUpload(true) }}
-          />)
-        }
+            onClick={() => {
+              setCanUpload(true);
+            }}
+          />
+        )}
       </div>
     </div>
   );

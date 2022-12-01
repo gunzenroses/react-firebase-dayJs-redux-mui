@@ -7,6 +7,17 @@ import styles from './ItemCreator.module.scss';
 
 const cn = classNames.bind(styles);
 
+/**
+ * @component
+ * @returns {ReactElement}
+ * 
+ * @example 
+ * return (
+ *     <ItemCreator />
+ * )
+ * 
+*/
+
 const ItemCreator = () => {
   const [isActive, setIsActive] = useState(false);
 

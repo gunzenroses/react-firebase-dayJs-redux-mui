@@ -13,6 +13,11 @@ enum Theme {
   accept = 'accept',
 }
 
+/** 
+ * @description Properties required for MyButton component
+ * @type {Props}
+*/
+
 type Props = {
   IconTag: SvgIconComponent;
   isActive?: boolean;
@@ -20,6 +25,20 @@ type Props = {
   theme?: string;
   onClick: () => void;
 };
+
+/**
+ * @component
+ * @description Component represents a button, which serves to accept or delete TodoItem.
+ * @param {Props} MyButtonProps
+ * @returns {ReactElement}
+ * 
+ * @example 
+ * import { SaveAsOutlined } from '@mui/icons-material';
+ * return (
+ *     <MyButton IconTag={SaveAsOutlined} isActive={false} status='missed' theme='accept' onClick={()=>{}} />
+ * )
+ * 
+*/
 
 const MyButton: FC<Props> = memo(({ IconTag, isActive, status, theme, onClick }) => {
   const isMissed = status === StatusEnum.missed;

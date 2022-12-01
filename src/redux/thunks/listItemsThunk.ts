@@ -1,5 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { _ActionCreatorWithPreparedPayload } from "@reduxjs/toolkit/dist/createAction";
 
 import { ListItemsFirebase } from 'firebaseApp/ListItemsFirebase';
 import { StorageFirebase } from "firebaseApp/StorageFirebase";
@@ -10,16 +9,16 @@ interface MyError {
 
 const getListItem = createAsyncThunk<
   ListItem[],
-  ModeType, 
+  null, 
   { rejectValue: MyError; }
->('listItemsSlice/getListItem', async (mode: ModeType, { rejectWithValue }) => {
+>('listItemsSlice/getListItem', async () => {
   try {
-    const data = await new ListItemsFirebase().getListItem(mode);
+    const data = await new ListItemsFirebase().getListItem();
     return data;
   } catch (error) {
     const errorWithMessage =
       error instanceof Error ? error : new Error("Can't get list of items");
-    return rejectWithValue(errorWithMessage);
+    return Promise.reject(errorWithMessage);
   }
 });
 

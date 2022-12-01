@@ -8,11 +8,31 @@ import styles from './ButtonCheck.module.scss';
 
 const cn = classNames.bind(styles);
 
+/** 
+ * @description Properties required for ButtonCheck component
+ * @type {Props}
+*/
+
 type Props = {
   status: TaskStatusType;
   isActive: boolean;
   onChange: (data: UpdateItem<'status'>) => void;
 };
+
+/**
+ * @component
+ * 
+ * @param {Props} ButtonCheckProps
+ * @returns {ReactElement}
+ * @example
+ * return (
+ *     <ButtonCheck 
+ *       status="progress" 
+ *       isActive=false 
+ *       onChange={({name: string, value: string})=>{}} 
+ *     />
+ * )
+ */
 
 const ButtonCheck: FC<Props> = ({ status, isActive, onChange }) => {
   const inProgress = status === StatusEnum.progress;

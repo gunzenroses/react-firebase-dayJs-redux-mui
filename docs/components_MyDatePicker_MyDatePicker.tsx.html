@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/MyDatePicker/MyDatePicker.tsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/MyDatePicker/MyDatePicker.tsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { FC, useEffect, useRef, useState, memo } from 'react';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers';
+import { TextField } from '@mui/material';
+import dayjs, { Dayjs } from 'dayjs';
+
+import { ButtonCalendar } from './ButtonCalendar/ButtonCalendar';
+
+import styles from './MyDatePicker.module.scss';
+
+/** 
+ * @description Properties required for MyDatePicker component
+ * @type {Props}
+*/
+type Props = {
+  status: TaskStatusType;
+  date: number | null;
+  onChange: (data: UpdateItem&lt;'date'>) => void;
+};
+
+/**
+ * @component
+ * @description Component has two elements: DataPicker and ButtonCalendar. 
+ * Click on ButtonCalendar toggle DataPicker appear and disappear. 
+ * ButtonCalendar also represents selected data, when DataPicker is hidden.
+ * @param {Props} MyDatePickerProps
+ * @returns {ReactElement}
+ * 
+ * @example 
+ * return (
+ *     &lt;MyDatePicker 
+ *        status='missed' 
+ *        date=null 
+ *        onChange={({name:'date', value: number | null})=>{}} 
+ *     />
+ * )
+*/
+
+const MyDatePicker: FC&lt;Props> = memo(({ status, date, onChange }) => {
+    const customInputComponent = useRef(null);
+
+    const [calendarDate, setCalendarDate] = useState&lt;Dayjs | null>(null);
+
+    useEffect(() => {
+      const initialDate = date ? dayjs.unix(date) : null;
+      setCalendarDate(initialDate);
+    }, [date]);
+
+    const calendarDateHandler = (date: Dayjs | null) => {
+      if (date !== calendarDate) {
+        setCalendarDate(date);
+        onChange({
+          name: 'date',
+          value: dayjs(date).unix()
+        });
+        setIsOpen(false);
+      };
+    };
+
+    const [isOpen, setIsOpen] = useState(false);
+
+    const onOpenHandler = () => {
+      setIsOpen((isOpen) => !isOpen);
+    };
+
+    useEffect(() => {
+      const closePopperComponent = (event: Event) => {
+        if (!isOpen) return;
+        const muiDialog = document.getElementsByClassName('MuiPaper-root')[0];
+        const isInArea = event
+          .composedPath()
+          .some((element) => element === muiDialog);
+        if (!isInArea) {
+          setIsOpen(false);
+        }
+      };
+
+      document.addEventListener('pointerup', closePopperComponent);
+
+      return () => {
+        document.removeEventListener('pointerup', closePopperComponent);
+      };
+    }, [isOpen]);
+
+    return (
+      &lt;LocalizationProvider dateAdapter={AdapterDayjs}>
+        &lt;DatePicker
+          open={isOpen}
+          className={styles.myDataPicker}
+          value={calendarDate}
+          onChange={calendarDateHandler}
+          orientation='portrait'
+          showToolbar={false}
+          disabled={status !== 'progress'}
+          disablePast
+          componentsProps={{
+            actionBar: {
+              actions: ['clear', 'accept'],
+            },
+          }}
+          views={['day']}
+          PopperProps={{
+            anchorEl: customInputComponent.current,
+            sx: {
+              '&amp; .MuiCalendarPicker-root': {
+                backgroundColor: 'yellow',
+              },
+            },
+          }}
+          renderInput={() => (
+            &lt;div ref={customInputComponent} className={styles.container}>
+              &lt;TextField style={{ opacity: 0, width: 0, height: 0 }} />
+              &lt;ButtonCalendar
+                status={status}
+                day={calendarDate}
+                onClick={onOpenHandler}
+              />
+            &lt;/div>
+          )}
+        />
+      &lt;/LocalizationProvider>
+    );
+  }
+);
+
+export { MyDatePicker };</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ButtonCheck.html">ButtonCheck</a></li><li><a href="FileHandler.html">FileHandler</a></li><li><a href="ItemCreator.html">ItemCreator</a></li><li><a href="ListItemsFirebase.html">ListItemsFirebase</a></li><li><a href="ModeList.html">ModeList</a></li><li><a href="MyButton.html">MyButton</a></li><li><a href="MyDatePicker.html">MyDatePicker</a></li><li><a href="MyIcon.html">MyIcon</a></li><li><a href="NavBar.html">NavBar</a></li><li><a href="StorageFirebase.html">StorageFirebase</a></li><li><a href="TodoItem.html">TodoItem</a></li><li><a href="TodoItemText.html">TodoItemText</a></li><li><a href="TodoList.html">TodoList</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkTimestampInPast">checkTimestampInPast</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Thu Dec 01 2022 01:58:02 GMT+0800 (Иркутск, стандартное время)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

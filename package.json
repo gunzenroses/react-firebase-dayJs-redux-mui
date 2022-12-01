@@ -1,6 +1,7 @@
 {
   "name": "react-firebase-dayJs-redux-mui",
   "version": "0.1.0",
+  "homepage": "https://gunzenroses.github.io/react-firebase-dayJs-redux-mui/",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.5",
@@ -29,6 +30,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "deploy": "npm run build && gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -54,7 +56,10 @@
     ]
   },
   "devDependencies": {
-    "better-docs": "^2.5.0",
-    "jsdoc": "^4.0.0"
+    "better-docs": "^2.0.0",
+    "gh-pages": "^4.0.0",
+    "jsdoc": "^4.0.0",
+    "jsdoc-ts-utils": "^3.1.0"
   }
 }
+

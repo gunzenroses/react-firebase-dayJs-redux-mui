@@ -1,19 +1,19 @@
 {
   "source": {
-    "include": ["src/components", "src/firebaseApp", "src/utils"],
+    "include": ["src/components", "src/firebaseApp", "src/utils", "src/types", "./README.md"],
     "includePattern": "\\.(jsx|js|ts|tsx)$",
     "excludePatterns": [
       "(node_modules/|docs|public)",
       "src/styles",
       "src/redux",
-      "src/types",
-      ".d.ts$"
+      "src/types"
     ]
   },
   "plugins": [
-    "plugins/markdown", 
+    "plugins/markdown",
     "node_modules/better-docs/typescript",
-    "node_modules/better-docs/component"
+    "node_modules/better-docs/component",
+    "node_modules/better-docs/category"
   ],
   "templates": {
     "cleverLinks": true,
@@ -25,11 +25,12 @@
     }
   },
   "tags": {
-    "allowUnknownTags": true
+    "allowUnknownTags": ["component", "category"],
+    "dictionaries": ["jsdoc", "closure"]
   },
   "opts": {
     "name": "my project",
     "recurse": true,
-    "destination": "./docs/"
+    "destination": "docs"
   }
 }

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/TodoItem/TodoItem.tsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/TodoItem/TodoItem.tsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { FC, memo, useState, useRef, useEffect, useCallback } from 'react';
+import { HighlightOff, SaveAsOutlined } from '@mui/icons-material';
+import classNames from "classnames";
+
+import { useMyDispatch } from 'redux/hooks';
+import { updateListItem, deleteListItem } from 'redux/thunks/listItemsThunk';
+import {
+  ButtonCheck,
+  TodoItemText,
+  MyDatePicker,
+  MyButton,
+  FileHandler,
+} from 'components';
+import { checkTimestampInPast } from 'utils/utils';
+
+import styles from './TodoItem.module.scss';
+
+const cn = classNames.bind(styles);
+
+/** 
+ * @description Properties required for TodoItem component
+ * @type {Props}
+*/
+type Props = {
+  id: string,
+  item: ItemData;
+  isActive: boolean;
+  activateItem: (id: string | null) => void;
+};
+
+/**
+ * @component
+ * @description Component renders TodoItem
+ * @param {Props} TodoItemProps
+ * @returns {ReactElement}
+ * 
+ * @example 
+ * return (
+ *     &lt;TodoItem 
+ *        id='123123' 
+ *        item={
+ *          status: 'completed',
+ *          title: 'todoItem title',
+ *          description: 'done!',
+ *          date: null,
+ *          fileURL: 'https://mock-url'
+ *        } 
+ *        isActive='true' 
+ *        activateItem={('122122')=>{}} 
+ *      />
+ * )
+ * 
+*/
+
+const TodoItem: FC&lt;Props> = memo(({ id, item, isActive, activateItem }) => {
+  const dispatch = useMyDispatch();
+
+  const activateItemHandler = () => {
+    if (!isActive) activateItem(id);
+  };
+
+  const { status, date, fileURL } = item;
+
+  const isPast = checkTimestampInPast(date);
+
+  if (isPast &amp;&amp; status !== 'missed') {
+    dispatch(updateListItem({ 
+      id, 
+      data: { status: 'missed' }
+    }));
+  }
+
+  const [canUpload, setCanUpload] = useState(false);
+
+  const [thisItem, setThisItem] = useState&lt;ItemData &amp; { file?: File | null }>(
+    item
+  );
+
+  const changeItemHandler = (
+    data: UpdateItem&lt;keyof ItemData> | UploadItem&lt;keyof ItemDataRaw>
+  ) => {
+    console.log(data);
+    setThisItem((oldData) => ({
+      ...oldData,
+      [data.name]: data.value,
+    }));
+  };
+
+  useEffect(() => {
+    if (!canUpload) return;
+    if (thisItem.title === '') {
+      setCanUpload(false);
+      setThisItem(item);
+      activateItem(null);
+    } else {
+      const fileInfo = fileURL ? fileURL : thisItem.file;
+      dispatch(
+        updateListItem({
+          id,
+          data: {
+            status: thisItem.status,
+            title: thisItem.title,
+            description: thisItem.description,
+            date: thisItem.date,
+          },
+          fileInfo: fileInfo,
+        })
+      );
+      setCanUpload(false);
+    }
+  }, [thisItem, canUpload]);
+
+  const closeComponent = useRef(null);
+
+  useEffect(() => {
+    const deactivateItemHandler = async (event: Event) => {
+      if (!isActive) {
+        return;
+      }
+      const muiDialog = document.getElementsByClassName('MuiPaper-root')[0];
+      if (muiDialog) return;
+
+      const isInArea = event
+        .composedPath()
+        .some((element) => element === closeComponent.current);
+      if (!isInArea) {
+        setThisItem(item);
+        activateItem(null);
+      }
+    };
+
+    document.addEventListener('pointerdown', deactivateItemHandler);
+
+    return () => {
+      document.removeEventListener('pointerdown', deactivateItemHandler);
+    };
+  }, [isActive]);
+
+  const deleteItemHandler = useCallback(async () => {
+    dispatch(deleteListItem({ id, fileURL }))
+  }, [dispatch, fileURL, id]);
+
+  return (
+    &lt;div
+      ref={closeComponent}
+      className={cn(styles.container, {
+        [styles.container_active]: isActive,
+      })}
+      onClick={activateItemHandler}
+    >
+      &lt;ButtonCheck
+        status={thisItem.status}
+        isActive={isActive}
+        onChange={changeItemHandler}
+      />
+      &lt;TodoItemText
+        status={thisItem.status}
+        isActive={isActive}
+        title={thisItem.title}
+        description={thisItem.description}
+        onChange={changeItemHandler}
+      />
+      &lt;div className={styles.icons}>
+        &lt;MyDatePicker
+          status={thisItem.status}
+          date={thisItem.date}
+          onChange={changeItemHandler}
+        />
+        {isActive &amp;&amp; (
+          &lt;FileHandler
+            status={thisItem.status}
+            fileURL={fileURL}
+            onUploadFile={changeItemHandler}
+          />
+        )}
+      &lt;/div>
+      &lt;div className={styles.buttons}>
+        &lt;MyButton
+          IconTag={HighlightOff}
+          isActive={false}
+          theme='delete'
+          onClick={deleteItemHandler}
+        />
+        {isActive &amp;&amp; (
+          &lt;MyButton
+            IconTag={SaveAsOutlined}
+            isActive={true}
+            status={thisItem.status}
+            theme='accept'
+            onClick={() => { setCanUpload(true) }}
+          />)
+        }
+      &lt;/div>
+    &lt;/div>
+  );
+});
+
+export { TodoItem };</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ButtonCheck.html">ButtonCheck</a></li><li><a href="FileHandler.html">FileHandler</a></li><li><a href="ItemCreator.html">ItemCreator</a></li><li><a href="ListItemsFirebase.html">ListItemsFirebase</a></li><li><a href="ModeList.html">ModeList</a></li><li><a href="MyButton.html">MyButton</a></li><li><a href="MyDatePicker.html">MyDatePicker</a></li><li><a href="MyIcon.html">MyIcon</a></li><li><a href="NavBar.html">NavBar</a></li><li><a href="StorageFirebase.html">StorageFirebase</a></li><li><a href="TodoItem.html">TodoItem</a></li><li><a href="TodoItemText.html">TodoItemText</a></li><li><a href="TodoList.html">TodoList</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkTimestampInPast">checkTimestampInPast</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Thu Dec 01 2022 01:58:02 GMT+0800 (Иркутск, стандартное время)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

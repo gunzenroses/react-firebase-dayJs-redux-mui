@@ -5,15 +5,37 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { TextField } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 
-import { ButtonCalendar } from 'components';
+import { ButtonCalendar } from './ButtonCalendar/ButtonCalendar';
 
 import styles from './MyDatePicker.module.scss';
 
+/** 
+ * @description Properties required for MyDatePicker component
+ * @type {Props}
+*/
 type Props = {
   status: TaskStatusType;
   date: number | null;
   onChange: (data: UpdateItem<'date'>) => void;
 };
+
+/**
+ * @component
+ * @description Component has two elements: DataPicker and ButtonCalendar. 
+ * Click on ButtonCalendar toggle DataPicker appear and disappear. 
+ * ButtonCalendar also represents selected data, when DataPicker is hidden.
+ * @param {Props} MyDatePickerProps
+ * @returns {ReactElement}
+ * 
+ * @example 
+ * return (
+ *     <MyDatePicker 
+ *        status='missed' 
+ *        date=null 
+ *        onChange={({name:'date', value: number | null})=>{}} 
+ *     />
+ * )
+*/
 
 const MyDatePicker: FC<Props> = memo(({ status, date, onChange }) => {
     const customInputComponent = useRef(null);

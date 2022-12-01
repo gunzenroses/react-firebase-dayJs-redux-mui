@@ -1,6 +1,5 @@
 export { MyIcon } from './MyIcon/MyIcon';
 export { MyButton } from './MyButton/MyButton';
-export { ButtonCalendar } from './ButtonCalendar/ButtonCalendar';
 export { MyDatePicker } from './MyDatePicker/MyDatePicker';
 export { FileHandler } from './FileHandler/FileHandler';
 export { ButtonCheck } from './ButtonCheck/ButtonCheck'

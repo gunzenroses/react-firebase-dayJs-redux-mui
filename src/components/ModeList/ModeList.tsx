@@ -11,6 +11,20 @@ import styles from './ModeList.module.scss';
 
 const cn = classNames.bind(styles);
 
+/**
+ * @component
+ * @description Component represents a menu with list of modes.
+ * In dependance with mode different items are rendered.
+ * 
+ * @returns {ReactElement}
+ * 
+ * @example 
+ * return (
+ *     <ModeList />
+ * )
+ * 
+*/
+
 const ModeList = memo(() => {
   const component = useRef(null);
 

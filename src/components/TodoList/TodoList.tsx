@@ -3,11 +3,24 @@ import classNames from 'classnames';
 
 import { useListItems, useMyDispatch, useViewMode } from 'redux/hooks';
 import { getListItem } from 'redux/thunks/listItemsThunk';
+import { ModeToType } from 'utils/constants';
 import { TodoItem } from "components";
 
 import styles from './TodoList.module.scss';
 
 const cn = classNames.bind(styles);
+
+/**
+ * @component
+ * @description Component initiate rendering of list of Todo Items.
+ * @returns {ReactElement}
+ * 
+ * @example
+ * return (
+ *     <TodoList />
+ * )
+ * 
+*/
 
 const TodoList = memo(() => {
 
@@ -16,10 +29,15 @@ const TodoList = memo(() => {
   const mode: ModeType = useViewMode();
 
   useEffect(() => {
-    dispatch(getListItem(mode));
-  }, [mode]);
+    dispatch(getListItem(null));
+  }, [dispatch, mode]);
 
   const listOfItems: ListItem[] = useListItems();
+
+  const myTodoList =
+    mode === 'All'
+      ? listOfItems
+      : listOfItems.filter((item) => item.data.status === ModeToType[mode]);
 
   const [activeItem, setActiveItem] = useState<string | null>(null);
 
@@ -29,8 +47,8 @@ const TodoList = memo(() => {
 
   return (
     <ul className={styles.container}>
-      {listOfItems.length > 0 &&
-        listOfItems.map((item) => {
+      {myTodoList.length > 0 &&
+        myTodoList.map((item) => {
           return (
             <li
               key={item.id}

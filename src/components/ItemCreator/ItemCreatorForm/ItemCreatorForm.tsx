@@ -69,7 +69,7 @@ const ItemCreatorForm: FC<Props> = ({ onClick }) => {
       dispatch(addListItem(thisItem));
       setThisItem(newItemData);
     }
-  }, [canUpload, thisItem]);
+  }, [dispatch, canUpload, thisItem]);
 
   return (
     <div ref={areaComponent} className={styles.container}>

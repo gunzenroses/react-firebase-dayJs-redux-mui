@@ -6,11 +6,32 @@ import { StatusEnum } from 'utils/constants';
 
 import styles from './FileHandler.module.scss';
 
+/** 
+ * @description Properties required for FileHandler component
+ * @type {Props}
+*/
+
 type Props = {
   status: TaskStatusType;
   fileURL: string;
   onUploadFile: (data: UploadItem<'file'>) => void;
 };
+
+/**
+ * @component
+ * @param {Props} FileHandlerProps
+ * @returns {ReactElement}
+ * 
+ * @example 
+ * return (
+ *     <FileHandler 
+ *      status='misses' 
+ *      fileURL='' 
+ *      onUploadFile={({name: 'file', value: File})=>{}}
+ *     />
+ * )
+ * 
+*/
 
 const FileHandler: FC<Props> = ({ status, fileURL, onUploadFile }) => {
   const isEmptyURL = fileURL === '';
