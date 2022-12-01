@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/TodoItemText/TodoItemText.tsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/TodoItemText/TodoItemText.tsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {
+  FC,
+  useRef,
+  useState,
+  useEffect,
+  ChangeEvent,
+  memo,
+  FocusEvent,
+} from 'react';
+import classNames from 'classnames';
+
+import { StatusEnum } from 'utils/constants';
+
+import styles from './TodoItemText.module.scss';
+
+const cn = classNames.bind(styles);
+
+/** 
+ * @description Properties required for TodoItemText component
+ * @type {Props}
+*/
+type Props = {
+  isActive: boolean;
+  status: TaskStatusType;
+  title: string;
+  description: string;
+  onChange: (data: UpdateItem&lt;'title' | 'description'>) => void;
+};
+
+/**
+ * @component
+ * @description Component represents 'Title' and 'Description' fields of TodoItem.
+ * @param {Props} TodoItemTextProps
+ * @returns {ReactElement}
+ * 
+ * @example 
+ * return (
+ *     &lt;TodoItemText 
+ *       isActive=true 
+ *       status='progress' 
+ *       title='Main task' 
+ *       description='small steps' 
+ *       onClick={()=>{}} 
+ *     />
+ * )
+ * 
+*/
+
+const TodoItemText: FC&lt;Props> = memo( 
+  ({ isActive, status, title, description, onChange }) => {
+      const [rows, setRows] = useState(1);
+
+      const linesInDescription = (element: HTMLTextAreaElement) => {
+        const value = element.value;
+        const lines = value.split(/\r|\r\n|\n/).length;
+        return lines;
+      }
+
+      const descRef = useRef(null);
+
+      useEffect(() => {
+        if (!isActive) return;
+        if (descRef.current) setRows(linesInDescription(descRef.current));
+      }, [descRef, isActive]);
+
+      const [currentTitle, setCurrentTitle] = useState(title);
+
+      const onTitleChange = (event: ChangeEvent&lt;HTMLInputElement>) => {
+        event.preventDefault();
+        const value = event.target.value;
+        setCurrentTitle(value);
+      };
+
+      const [currentDescription, setCurrentDescription] = useState(description);
+
+      const onDescriptionChange = (event: ChangeEvent&lt;HTMLTextAreaElement>) => {
+        event.preventDefault();
+        const that = event.target;
+        setRows(linesInDescription(that));
+        setCurrentDescription(that.value);
+      };
+
+      const onChangeHandler = (
+        event: FocusEvent&lt;HTMLTextAreaElement> | FocusEvent&lt;HTMLInputElement>
+      ) => {
+        if (event.target.name === 'title') {
+          if (title !== currentTitle) {
+            onChange({
+              name: 'title',
+              value: currentTitle
+            })
+          }
+        } else if (event.target.name === 'description') {
+          if (description !== currentDescription) {
+            onChange({
+              name: 'description',
+              value: currentDescription
+            })
+          }
+        }
+      };
+
+      return (
+        &lt;div className={styles.text}>
+          &lt;input
+            type='text'
+            className={cn(styles.title, {
+              [styles.title_active]: isActive,
+              [styles.title_completed]: status === StatusEnum.completed,
+              [styles.title_missed]: status === StatusEnum.missed,
+            })}
+            placeholder='What do you plan?'
+            value={currentTitle}
+            name='title'
+            readOnly={status !== 'progress'}
+            onChange={onTitleChange}
+            onBlur={onChangeHandler}
+          />
+          {isActive &amp;&amp; (
+            &lt;textarea
+              ref={descRef}
+              className={cn(styles.description, {
+                [styles.description_completed]: status === StatusEnum.completed,
+                [styles.description_missed]: status === StatusEnum.missed,
+              })}
+              placeholder='Add some details...'
+              value={currentDescription}
+              name='description'
+              readOnly={status !== 'progress'}
+              rows={rows}
+              onChange={onDescriptionChange}
+              onBlur={onChangeHandler}
+            />
+          )}
+        &lt;/div>
+      );
+    }
+);
+
+export { TodoItemText };</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ButtonCheck.html">ButtonCheck</a></li><li><a href="FileHandler.html">FileHandler</a></li><li><a href="ItemCreator.html">ItemCreator</a></li><li><a href="ListItemsFirebase.html">ListItemsFirebase</a></li><li><a href="ModeList.html">ModeList</a></li><li><a href="MyButton.html">MyButton</a></li><li><a href="MyDatePicker.html">MyDatePicker</a></li><li><a href="MyIcon.html">MyIcon</a></li><li><a href="NavBar.html">NavBar</a></li><li><a href="StorageFirebase.html">StorageFirebase</a></li><li><a href="TodoItem.html">TodoItem</a></li><li><a href="TodoItemText.html">TodoItemText</a></li><li><a href="TodoList.html">TodoList</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkTimestampInPast">checkTimestampInPast</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Thu Dec 01 2022 17:21:05 GMT+0800 (Иркутск, стандартное время)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
