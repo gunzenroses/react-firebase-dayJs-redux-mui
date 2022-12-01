@@ -8,6 +8,9 @@ The aims of this project are:
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+### [Check page of gh-pages](https://gunzenroses.github.io/react-firebase-dayJs-redux-mui/build/)
+### [Read the documentation](https://gunzenroses.github.io/react-firebase-dayJs-redux-mui/docs/)
+
 ## Available Scripts
 
 In the project directory, you can run:
